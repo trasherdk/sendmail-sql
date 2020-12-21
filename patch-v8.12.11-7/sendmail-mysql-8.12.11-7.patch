@@ -1,0 +1,2102 @@
+diff -urN sendmail-8.12.11-dist/cf/feature/sql-genericstable.m4 sendmail-8.12.11/cf/feature/sql-genericstable.m4
+--- sendmail-8.12.11-dist/cf/feature/sql-genericstable.m4	1970-01-01 01:00:00.000000000 +0100
++++ sendmail-8.12.11/cf/feature/sql-genericstable.m4	2004-02-08 16:27:24.317349511 +0000
+@@ -0,0 +1,25 @@
++divert(-1)
++#
++# Copyright (c) 1998, 1999, 2001 Sendmail, Inc. and its suppliers.
++#	All rights reserved.
++# Copyright (c) 1983 Eric P. Allman.  All rights reserved.
++# Copyright (c) 1988, 1993
++#	The Regents of the University of California.  All rights reserved.
++#
++# By using this file, you agree to the terms and conditions set
++# forth in the LICENSE file which can be found at the top level of
++# the sendmail distribution.
++#
++#
++
++divert(0)
++VERSIONID(`$Id: sendmail+mysql-8.12.11-7.patch,v 1.1 2004/02/26 16:58:52 root Exp root $')
++divert(-1)
++
++_DEFIFNOT(`SQL_GENERICS_TABLE', `genericstable')
++_DEFIFNOT(`DATABASE_MAP_TYPE', `mysql')
++
++
++LOCAL_CONFIG
++# Generics table (mapping outgoing addresses) in sendmail-sql
++Kgenerics DATABASE_MAP_TYPE -M SQL_GENERICS_TABLE
+diff -urN sendmail-8.12.11-dist/cf/feature/sql-mailertable.m4 sendmail-8.12.11/cf/feature/sql-mailertable.m4
+--- sendmail-8.12.11-dist/cf/feature/sql-mailertable.m4	1970-01-01 01:00:00.000000000 +0100
++++ sendmail-8.12.11/cf/feature/sql-mailertable.m4	2004-02-08 16:27:24.317349511 +0000
+@@ -0,0 +1,25 @@
++divert(-1)
++#
++# Copyright (c) 1998, 1999, 2001 Sendmail, Inc. and its suppliers.
++#	All rights reserved.
++# Copyright (c) 1983 Eric P. Allman.  All rights reserved.
++# Copyright (c) 1988, 1993
++#	The Regents of the University of California.  All rights reserved.
++#
++# By using this file, you agree to the terms and conditions set
++# forth in the LICENSE file which can be found at the top level of
++# the sendmail distribution.
++#
++#
++
++divert(0)
++VERSIONID(`$Id: sendmail+mysql-8.12.11-7.patch,v 1.1 2004/02/26 16:58:52 root Exp root $')
++divert(-1)
++
++_DEFIFNOT(`SQL_MAILER_TABLE', `mailertable')
++_DEFIFNOT(`DATABASE_MAP_TYPE', `mysql')
++
++
++LOCAL_CONFIG
++# Mailer table (overriding domains) in sendmail-sql
++Kmailertable DATABASE_MAP_TYPE -M SQL_MAILER_TABLE
+diff -urN sendmail-8.12.11-dist/cf/feature/sql-virtusertable.m4 sendmail-8.12.11/cf/feature/sql-virtusertable.m4
+--- sendmail-8.12.11-dist/cf/feature/sql-virtusertable.m4	1970-01-01 01:00:00.000000000 +0100
++++ sendmail-8.12.11/cf/feature/sql-virtusertable.m4	2004-02-08 16:27:24.318349295 +0000
+@@ -0,0 +1,25 @@
++divert(-1)
++#
++# Copyright (c) 1998, 1999, 2001 Sendmail, Inc. and its suppliers.
++#	All rights reserved.
++# Copyright (c) 1983 Eric P. Allman.  All rights reserved.
++# Copyright (c) 1988, 1993
++#	The Regents of the University of California.  All rights reserved.
++#
++# By using this file, you agree to the terms and conditions set
++# forth in the LICENSE file which can be found at the top level of
++# the sendmail distribution.
++#
++#
++
++divert(0)
++VERSIONID(`$Id: sendmail+mysql-8.12.11-7.patch,v 1.1 2004/02/26 16:58:52 root Exp root $')
++divert(-1)
++
++_DEFIFNOT(`SQL_VIRTUSER_TABLE', `virtusertable')
++_DEFIFNOT(`DATABASE_MAP_TYPE', `mysql')
++
++
++LOCAL_CONFIG
++# Virtual user table (maps incoming users) in sendmail-sql
++Kvirtuser DATABASE_MAP_TYPE -M SQL_VIRTUSER_TABLE
+diff -urN sendmail-8.12.11-dist/cf/feature/use_cw_sql.m4 sendmail-8.12.11/cf/feature/use_cw_sql.m4
+--- sendmail-8.12.11-dist/cf/feature/use_cw_sql.m4	1970-01-01 01:00:00.000000000 +0100
++++ sendmail-8.12.11/cf/feature/use_cw_sql.m4	2004-02-08 16:27:24.361339995 +0000
+@@ -0,0 +1,25 @@
++divert(-1)
++#
++# Copyright (c) 1998, 1999, 2001 Sendmail, Inc. and its suppliers.
++#	All rights reserved.
++# Copyright (c) 1983 Eric P. Allman.  All rights reserved.
++# Copyright (c) 1988, 1993
++#	The Regents of the University of California.  All rights reserved.
++#
++# By using this file, you agree to the terms and conditions set
++# forth in the LICENSE file which can be found at the top level of
++# the sendmail distribution.
++#
++#
++
++divert(0)
++VERSIONID(`$Id: sendmail+mysql-8.12.11-7.patch,v 1.1 2004/02/26 16:58:52 root Exp root $')
++divert(-1)
++
++# if defined, the sendmail.cf will read from the specified database
++# to find alternate names for this host.  Typically only used when several
++# hosts have been squashed into one another at high speed.
++
++define(`USE_CW_SQL', `')
++
++divert(0)
+diff -urN sendmail-8.12.11-dist/cf/m4/proto.m4 sendmail-8.12.11/cf/m4/proto.m4
+--- sendmail-8.12.11-dist/cf/m4/proto.m4	2004-01-11 17:54:06.000000000 +0000
++++ sendmail-8.12.11/cf/m4/proto.m4	2004-02-08 16:27:24.397332208 +0000
+@@ -107,6 +107,13 @@
+ Fw`'confCW_FILE',
+ 	`dnl')
+ 
++ifdef(`USE_CW_SQL',
++_DEFIFNOT(`DATABASE_MAP_TYPE', `mysql')
++_DEFIFNOT(`SQL_CW_TABLE', `cw')
++`# sql database containing names of hosts for which we receive email
++Kw`'DATABASE_MAP_TYPE' -M`'SQL_CW_TABLE',
++       `dnl')
++
+ # my official domain name
+ # ... `define' this only if sendmail cannot automatically determine your domain
+ ifdef(`confDOMAIN_NAME', `Dj`'confDOMAIN_NAME', `#Dj$w.Foo.COM')
+diff -urN sendmail-8.12.11-dist/include/sendmail/sm_mysql.h sendmail-8.12.11/include/sendmail/sm_mysql.h
+--- sendmail-8.12.11-dist/include/sendmail/sm_mysql.h	1970-01-01 01:00:00.000000000 +0100
++++ sendmail-8.12.11/include/sendmail/sm_mysql.h	2004-02-08 16:27:24.397332208 +0000
+@@ -0,0 +1,30 @@
++#include <pwd.h>
++#include <sys/types.h>
++#include <mysql.h>
++
++struct mysql_sendmail_struct
++{
++        char            *mysql_host;
++        char            *mysql_socket;
++        int             mysql_port;
++        char            *mysql_user;
++        char            *mysql_passwd;
++        char            *mysql_database;
++        char            *mysql_user_table;
++        char            *mysql_mailbox_table;
++        char            *mysql_alias_table;
++        char            *mysql_map_table;
++        char            *mysql_lhs_col;
++        char            *mysql_rhs_col;
++};
++
++struct mysql_sendmail_struct *get_mysql_conf();
++char *mysql_map_dequote(char *);
++
++typedef struct mysql_sendmail_struct  MYSQLMAP_STRUCT;
++MYSQLMAP_STRUCT *mysql_map_scanconf();
++MYSQL_RES *udb_result;
++
++#define EX_NOTFOUND    EX_NOHOST
++#define SQL_BUF_SIZE	128
++
+diff -urN sendmail-8.12.11-dist/include/sm/sql.h sendmail-8.12.11/include/sm/sql.h
+--- sendmail-8.12.11-dist/include/sm/sql.h	1970-01-01 01:00:00.000000000 +0100
++++ sendmail-8.12.11/include/sm/sql.h	2004-02-08 16:27:24.398331992 +0000
+@@ -0,0 +1,40 @@
++#include <pwd.h>
++#include <sys/types.h>
++#include <mysql.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <syslog.h>
++#include <sm/debug.h>
++
++MYSQL_RES *result;
++my_ulonglong num_rows;
++my_ulonglong num_fields;
++MYSQL_ROW field;
++struct mysql_sendmail_struct *mysqlconf;
++void mbdb_mysql_debug( char *arg );
++
++#define SQL_CONF_FILE	"/etc/mail/sqlmail.conf"
++#define SQL_BUF_SIZE	128
++MYSQL mbdb_mysql;
++
++struct mysql_sendmail_struct
++{
++        char            *mysql_host;
++        char            *mysql_socket;
++        int             mysql_port;
++        char            *mysql_user;
++        char            *mysql_passwd;
++        char            *mysql_database;
++        char            *mysql_user_table;
++        char            *mysql_mailbox_table;
++        char            *mysql_alias_table;
++        char            *mysql_map_table;
++        char            *mysql_lhs_col;
++        char            *mysql_rhs_col;
++};
++
++/* Functions */
++extern void mbdb_mysql_debug(char *arg);
++struct mysql_sendmail_struct *libsm_get_mysql_conf();
++
+diff -urN sendmail-8.12.11-dist/libsm/Makefile.m4 sendmail-8.12.11/libsm/Makefile.m4
+--- sendmail-8.12.11-dist/libsm/Makefile.m4	2002-06-21 22:58:29.000000000 +0100
++++ sendmail-8.12.11/libsm/Makefile.m4	2004-02-08 16:27:24.398331992 +0000
+@@ -5,7 +5,7 @@
+ define(`confREQUIRE_LIBSM', `true')
+ PREPENDDEF(`confENVDEF', `confMAPDEF')
+ bldPRODUCT_START(`library', `libsm')
+-define(`bldSOURCES', ` assert.c debug.c errstring.c exc.c heap.c match.c rpool.c strdup.c strerror.c strl.c clrerr.c fclose.c feof.c ferror.c fflush.c fget.c fpos.c findfp.c flags.c fopen.c fprintf.c fpurge.c fput.c fread.c fscanf.c fseek.c fvwrite.c fwalk.c fwrite.c get.c makebuf.c put.c refill.c rewind.c setvbuf.c smstdio.c snprintf.c sscanf.c stdio.c strio.c ungetc.c vasprintf.c vfprintf.c vfscanf.c vprintf.c vsnprintf.c vsprintf.c vsscanf.c wbuf.c wsetup.c string.c stringf.c xtrap.c strto.c test.c path.c strcasecmp.c strrevcmp.c signal.c clock.c config.c shm.c mbdb.c strexit.c cf.c ldap.c niprop.c mpeix.c ')
++define(`bldSOURCES', ` assert.c debug.c errstring.c exc.c heap.c match.c rpool.c strdup.c strerror.c strl.c clrerr.c fclose.c feof.c ferror.c fflush.c fget.c fpos.c findfp.c flags.c fopen.c fprintf.c fpurge.c fput.c fread.c fscanf.c fseek.c fvwrite.c fwalk.c fwrite.c get.c makebuf.c put.c refill.c rewind.c setvbuf.c smstdio.c snprintf.c sscanf.c stdio.c strio.c ungetc.c vasprintf.c vfprintf.c vfscanf.c vprintf.c vsnprintf.c vsprintf.c vsscanf.c wbuf.c wsetup.c string.c stringf.c xtrap.c strto.c test.c path.c strcasecmp.c strrevcmp.c signal.c clock.c config.c shm.c mbdb.c strexit.c cf.c ldap.c niprop.c sql.c mpeix.c ')
+ bldPRODUCT_END
+ dnl sem.c msg.c
+ dnl syslogio.c
+diff -urN sendmail-8.12.11-dist/libsm/mbdb.c sendmail-8.12.11/libsm/mbdb.c
+--- sendmail-8.12.11-dist/libsm/mbdb.c	2002-11-20 22:59:06.000000000 +0000
++++ sendmail-8.12.11/libsm/mbdb.c	2004-02-08 16:27:24.429325287 +0000
+@@ -37,6 +37,9 @@
+ #  include <sm/ldap.h>
+ # endif /* _LDAP_EXAMPLE_ */
+ #endif /* LDAPMAP */
++#ifdef MYSQLMAP
++#  include <sm/sql.h>
++#endif /* MYSQLMAP */
+ 
+ typedef struct
+ {
+@@ -59,6 +62,13 @@
+ # endif /* _LDAP_EXAMPLE_ */
+ #endif /* LDAPMAP */
+ 
++#ifdef MYSQLMAP
++extern struct mysql_sendmail_struct *libsm_get_mysql_conf();
++static int	mbdb_mysql_initialize __P((char *));
++static int	mbdb_mysql_lookup __P((char *name, SM_MBDB_T *user));
++static void	mbdb_mysql_terminate __P((void));
++#endif /* MYSQLMAP */
++
+ static SM_MBDB_TYPE_T SmMbdbTypes[] =
+ {
+ 	{ "pw", mbdb_pw_initialize, mbdb_pw_lookup, mbdb_pw_terminate },
+@@ -67,6 +77,10 @@
+ 	{ "ldap", mbdb_ldap_initialize, mbdb_ldap_lookup, mbdb_ldap_terminate },
+ # endif /* _LDAP_EXAMPLE_ */
+ #endif /* LDAPMAP */
++#ifdef MYSQLMAP
++	{ "mysql", mbdb_mysql_initialize, mbdb_mysql_lookup,
++		mbdb_mysql_terminate },
++#endif /* MYSQLMAP */
+ 	{ NULL, NULL, NULL, NULL }
+ };
+ 
+@@ -772,3 +786,117 @@
+ }
+ # endif /* _LDAP_EXAMPLE_ */
+ #endif /* LDAPMAP */
++
++extern MYSQL mbdb_mysql;
++extern void mbdb_mysql_debug(char *arg);
++extern SM_DEBUG_T SmMySQLTrace;
++
++ /* mbdb_mysql_lookup()
++    Fetch a user's details from the specified table based on user_name. */
++static int     mbdb_mysql_lookup(name, user)
++	char *name;
++	SM_MBDB_T *user;
++{
++	char tmpname[(strlen(name)*2+1)];
++	char queryBuf[SQL_BUF_SIZE];
++	int queryResult = 0;
++	static struct passwd pw;
++	if (!mysql_real_connect(&mbdb_mysql,mysqlconf->mysql_host,mysqlconf->mysql_user,mysqlconf->mysql_passwd,mysqlconf->mysql_database,mysqlconf->mysql_port,mysqlconf->mysql_socket,0))
++	{
++       	if (sm_debug_active(&SmMySQLTrace,4)) {
++		   sm_dprintf("Failed to connect to mysql server for mbdb lookup: %s", mysql_error(&mbdb_mysql));
++		}
++		mysql_close(&mbdb_mysql);
++		return EX_TEMPFAIL;
++	}
++	mbdb_mysql_debug(NULL);
++	if (mysql_ping(&mbdb_mysql) != 0) {
++       	if (sm_debug_active(&SmMySQLTrace,4)) {
++		   sm_dprintf("Failed to retain connection, mysql_ping() failed: %d.",mysql_errno(&mbdb_mysql));
++		}
++		return EX_TEMPFAIL;
++	}
++	
++	mysql_real_escape_string(&mbdb_mysql,(char *)tmpname,name,strlen(name));
++	snprintf(queryBuf, sizeof(queryBuf),
++		"SELECT * FROM %s WHERE username = \'%s\'",
++		mysqlconf->mysql_mailbox_table,&tmpname);
++
++       queryResult = mysql_query(&mbdb_mysql,queryBuf);
++       if (sm_debug_active(&SmMySQLTrace,4)) {
++	  if (queryResult != 0) {
++		if (sm_debug_active(&SmMySQLTrace,4)) {
++	           sm_dprintf("Error performing MySQL query (%s): %s\n",mysql_error(&mbdb_mysql), mbdb_mysql.host);
++		}
++		mysql_close(&mbdb_mysql);
++	        return EX_TEMPFAIL;
++	  }
++	}
++	if((result=mysql_store_result(&mbdb_mysql)) == NULL)
++	{
++		if (sm_debug_active(&SmMySQLTrace,4)) {
++	           sm_dprintf("Error storing MySQL result (%s): %s\n",mysql_error(&mbdb_mysql), mbdb_mysql.host);
++		mysql_close(&mbdb_mysql);
++		}
++		return EX_TEMPFAIL;
++	}
++	num_rows=mysql_num_rows(result);
++	num_fields=mysql_num_fields(result);
++	if(num_rows == 0)
++	{
++		mysql_free_result(result);
++		mysql_close(&mbdb_mysql);
++		if (sm_debug_active(&SmMySQLTrace,4)) {
++		   sm_dprintf("MySQL user database, no match found for %s\n",name);
++	        }
++		return EX_NOUSER;
++	}
++
++	field=mysql_fetch_row(result);
++
++	pw.pw_name = field[0];
++	pw.pw_passwd = field[1];
++	pw.pw_uid = atoi(field[2]);
++	pw.pw_gid = atoi(field[3]);
++	if((pw.pw_gecos = field[4]) == NULL)
++	  pw.pw_gecos = ",,,";
++	pw.pw_dir = field[5];
++	if((pw.pw_shell = field[6]) == NULL)
++	   pw.pw_shell = "/bin/noshell";
++	mysql_free_result(result);
++	if (sm_debug_active(&SmMySQLTrace,4)) {
++	   sm_dprintf("Found: %s:PASS:%d:%d:%s:%s\n",pw.pw_name,pw.pw_uid,
++	   pw.pw_gid,pw.pw_gecos,pw.pw_dir,pw.pw_shell);
++       }
++	mysql_close(&mbdb_mysql);
++	sm_mbdb_frompw(user, &pw);
++	return EX_OK;
++} 
++static int
++mbdb_mysql_initialize(arg)
++	        char *arg;
++{
++	if (mysql_init(&mbdb_mysql) == NULL) {
++          if (sm_debug_active(&SmMySQLTrace,4)) {
++             sm_dprintf("mysql_init() failed.");
++	   }
++          return EX_TEMPFAIL;
++       }
++	mysqlconf = libsm_get_mysql_conf();
++  	if(mysqlconf == NULL)
++  	{
++          if (sm_debug_active(&SmMySQLTrace,4)) {
++             sm_dprintf("libsm_get_mysql_conf() failed.");
++	   }
++          return EX_TEMPFAIL;
++  	}
++	return EX_OK;
++}
++
++static void
++mbdb_mysql_terminate()
++{
++//     There doesn't seem to be anything that needs doing here.
++//	mysql_close(&mbdb_mysql);
++}
++
+diff -urN sendmail-8.12.11-dist/libsm/sql.c sendmail-8.12.11/libsm/sql.c
+--- sendmail-8.12.11-dist/libsm/sql.c	1970-01-01 01:00:00.000000000 +0100
++++ sendmail-8.12.11/libsm/sql.c	2004-02-08 16:27:24.429325287 +0000
+@@ -0,0 +1,179 @@
++#include <pwd.h>
++#include <sys/types.h>
++#include <mysql.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <syslog.h>
++#include <sm/sql.h>
++#include <sm/sysexits.h>
++#include <sm/mbdb.h>
++#include <sm/debug.h>
++
++
++SM_DEBUG_T SmMySQLTrace = SM_DEBUG_INITIALIZER("sm_trace_mysql",
++        "@(#)$Debug: sm_trace_mysql - trace MySQL operations $");
++
++struct mysql_sendmail_struct *libsm_get_mysql_conf() {
++	static struct mysql_sendmail_struct mss;
++	static char host[SQL_BUF_SIZE], user[SQL_BUF_SIZE], password[SQL_BUF_SIZE], portnum[SQL_BUF_SIZE],
++		database[SQL_BUF_SIZE], user_table[SQL_BUF_SIZE],
++		alias_table[SQL_BUF_SIZE], map_table[SQL_BUF_SIZE],
++		lhs_col[SQL_BUF_SIZE],rhs_col[SQL_BUF_SIZE],
++		mailbox_table[SQL_BUF_SIZE],mysql_socket[SQL_BUF_SIZE];
++	extern MYSQL mbdb_mysql;
++	char buf[256];
++	char *name, *value;
++	int  pos;
++	char *delim = "\n \t";
++	FILE *conf;
++	extern char *UdbSpec; 
++	extern char *Mbdb;
++
++	mss.mysql_host = NULL;
++	mss.mysql_user = NULL;
++	mss.mysql_passwd = NULL;
++	mss.mysql_database = NULL;
++	mss.mysql_mailbox_table = NULL;
++	mss.mysql_map_table = NULL;
++	mss.mysql_rhs_col = NULL;
++	mss.mysql_lhs_col = NULL;
++	mss.mysql_socket = NULL;
++	mss.mysql_port = 0;
++
++	if(!(conf = fopen(SQL_CONF_FILE, "r"))) {
++		/* Could not open config file */
++		return NULL;
++       }
++
++	while(fgets(buf, 256, conf)) {
++		for(pos=0; strchr(delim+1, buf[pos]) && buf[pos]; pos++)
++			;
++		name = buf+pos;
++		if(*name=='#' || *name=='\n' || *name==0)
++			continue;
++		for(; !strchr(delim, buf[pos]) && buf[pos]; pos++)
++			;
++		buf[pos] = 0;
++		if(!*name) continue;
++		for(pos++; strchr(delim+1, buf[pos]) && buf[pos]; pos++)
++			;
++		value = buf+pos;
++		for(; !strchr(delim, buf[pos]) && buf[pos]; pos++)
++			;
++		buf[pos] = 0;
++		if(!*value) continue;
++		switch(name[5]) {
++		case 'H':
++			if(!strcmp(name, "MysqlHost")) {
++				strncpy(host, value, SQL_BUF_SIZE);
++				mss.mysql_host = host;
++			}
++			break;
++		case 'U':
++			if(!strcmp(name, "MysqlUsername")) {
++				strncpy(user, value, SQL_BUF_SIZE);
++				mss.mysql_user = user;
++			} else if(!strcmp(name, "MysqlUserTable")) {
++				strncpy(user_table, value, SQL_BUF_SIZE);
++				mss.mysql_user_table = user_table;
++			}
++			break;
++		case 'D':
++			if(!strcmp(name, "MysqlDatabase")) {
++				strncpy(database, value, SQL_BUF_SIZE);
++				mss.mysql_database = database;
++			} 
++			break;
++		case 'A':
++			if(!strcmp(name, "MysqlAliasTable")) {
++				strncpy(alias_table, value, SQL_BUF_SIZE);
++				mss.mysql_alias_table = alias_table;
++			}
++			break;
++		case 'N':
++			if(!strcmp(name, "MysqlNetworkPort")) {
++				strncpy(portnum, value, SQL_BUF_SIZE);
++				mss.mysql_port = atoi(portnum);
++			}
++			break;
++		case 'P':
++			if(!strcmp(name, "MysqlPassword")) {
++				strncpy(password, value, SQL_BUF_SIZE);
++				mss.mysql_passwd = password;
++			}
++			break;
++		case 'S':
++			if(!strcmp(name, "MysqlSocket")) {
++				strncpy(mysql_socket, value, SQL_BUF_SIZE);
++				mss.mysql_socket = mysql_socket;
++			}
++			break;
++		case 'M':
++			if(!strcmp(name, "MysqlMailboxTable")) {
++				strncpy(mailbox_table, value, SQL_BUF_SIZE);
++				mss.mysql_mailbox_table = mailbox_table;
++#ifdef MYSQLMAP
++			} else if(!strcmp(name, "MysqlMapTable")){
++				strncpy(map_table, value, SQL_BUF_SIZE);
++				mss.mysql_map_table = map_table;
++#endif /* MYSQLMAP */
++			}
++			break;
++#ifdef MYSQLMAP
++		case 'R':
++			if(!strcmp(name, "MysqlRHSColumn")) {
++				strncpy(rhs_col, value, SQL_BUF_SIZE);
++				mss.mysql_rhs_col = rhs_col;
++			}
++			break;
++		case 'L':
++			if(!strcmp(name, "MysqlLHSColumn")) {
++				strncpy(lhs_col, value, SQL_BUF_SIZE);
++				mss.mysql_lhs_col = lhs_col;
++			}
++			break;
++#endif /* MYSQLMAP */
++		default:
++        		sm_dprintf("Unrecognised configuration directive found: %s", name);
++			break;
++		}
++	}
++	fclose(conf);
++
++	// Validate configuration.
++	// Must have host or socket
++	// user, database, user table, alias table.
++
++	// password may be null.
++
++	// If we are using MYSQL maps, we need the default LHS and RHS columns.
++	if((mss.mysql_host || mss.mysql_socket)
++            && mss.mysql_user && /* mss.mysql_passwd && */
++		mss.mysql_database &&
++#ifdef MYSQLMAP
++		mss.mysql_lhs_col && mss.mysql_rhs_col && 
++#endif
++		mss.mysql_alias_table)
++	{
++		return &mss;
++	}
++	return NULL;
++}
++
++void mbdb_mysql_debug(arg)
++	        char *arg;
++{
++   extern MYSQL mbdb_mysql;
++
++   if (sm_debug_active(&SmMySQLTrace,4)) {
++      sm_dprintf("mbdb_mysql_debug()\n");
++      sm_dprintf("MYSQL Connection Parameters: host=%s,socket=%s,user=%s\n",
++	   mbdb_mysql.host,mbdb_mysql.unix_socket,mbdb_mysql.user);
++      sm_dprintf("MYSQL Error Number, and String: number=%d,string=%s\n",
++		mysql_errno(&mbdb_mysql), mysql_error(&mbdb_mysql));
++	if (arg != NULL) {
++          sm_dprintf(arg);
++	}
++   }
++}
++
+diff -urN sendmail-8.12.11-dist/mail.local/mail.local.c sendmail-8.12.11/mail.local/mail.local.c
+--- sendmail-8.12.11-dist/mail.local/mail.local.c	2003-09-01 02:49:46.000000000 +0100
++++ sendmail-8.12.11/mail.local/mail.local.c	2004-02-08 16:27:24.430325071 +0000
+@@ -32,6 +32,9 @@
+ #include <sm/mbdb.h>
+ #include <sm/sysexits.h>
+ 
++#ifdef MYSQLMAP
++#include <sm/sql.h>
++#endif
+ /*
+ **  This is not intended to work on System V derived systems
+ **  such as Solaris or HP-UX, since they use a totally different
+@@ -266,7 +269,21 @@
+ 	if (from == NULL && ((from = getlogin()) == NULL ||
+ 			     (pw = getpwnam(from)) == NULL ||
+ 			     pw->pw_uid != uid))
+-		from = (pw = getpwuid(uid)) != NULL ? pw->pw_name : "???";
++#ifdef MYSQLMAP
++        {
++            if (from == NULL && ((from = getlogin()) == NULL ||
++                   (pw = get_mysql_pwd(from)) == NULL ||
++                    pw->pw_uid != uid))
++               if (mbdb_mysql_lookup(pw->pw_name,mbdbname) == EX_OK) {
++                  (void) sm_strlcpy(pw->pw_name, mbdbname, sizeof(pw->pw_name));
++               } else {
++#endif
++                 from = (pw = getpwuid(uid)) != NULL ? pw->pw_name : "???";
++#ifdef MYSQLMAP
++               }
++        }
++#endif
++
+ 
+ 	/*
+ 	**  There is no way to distinguish the error status of one delivery
+diff -urN sendmail-8.12.11-dist/mail.local/mysql_local.c sendmail-8.12.11/mail.local/mysql_local.c
+--- sendmail-8.12.11-dist/mail.local/mysql_local.c	1970-01-01 01:00:00.000000000 +0100
++++ sendmail-8.12.11/mail.local/mysql_local.c	2004-02-08 16:28:04.365685718 +0000
+@@ -0,0 +1,285 @@
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <sm/sql.h>
++#include "mysql_local.h"
++
++#define SQL_CONF_FILE	"/etc/mail/sqlmail.conf"
++#define SQL_BUF_SIZE	128
++
++MYSQL mysql;
++MYSQL_RES *result;
++my_ulonglong num_rows;
++my_ulonglong num_fields;
++MYSQL_ROW field;
++struct mysql_sendmail_struct *mysqlconf;
++
++struct mysql_sendmail_struct *get_mysql_conf() {
++	static struct mysql_sendmail_struct mss;
++	static char host[SQL_BUF_SIZE], user[SQL_BUF_SIZE], password[SQL_BUF_SIZE],
++		database[SQL_BUF_SIZE], user_table[SQL_BUF_SIZE],
++		alias_table[SQL_BUF_SIZE], map_table[SQL_BUF_SIZE],
++		lhs_col[SQL_BUF_SIZE],rhs_col[SQL_BUF_SIZE],
++		mailbox_table[SQL_BUF_SIZE],mysql_socket[SQL_BUF_SIZE];
++	extern MYSQL ml_mysql;
++	char buf[256];
++	char *name, *value;
++	int  pos;
++	char *delim = "\n \t";
++	FILE *conf;
++	extern char *UdbSpec; 
++	extern char *Mbdb;
++
++	mss.mysql_host = NULL;
++	mss.mysql_user = NULL;
++	mss.mysql_passwd = NULL;
++	mss.mysql_database = NULL;
++	mss.mysql_user_table = NULL;
++	mss.mysql_mailbox_table = NULL;
++	mss.mysql_map_table = NULL;
++	mss.mysql_rhs_col = NULL;
++	mss.mysql_lhs_col = NULL;
++	mss.mysql_socket = NULL;
++	mss.mysql_port = 0;
++
++	if(!(conf = fopen(SQL_CONF_FILE, "r"))) {
++		/* Could not open config file */
++		return NULL;
++       }
++	while(fgets(buf, 256, conf)) {
++		for(pos=0; strchr(delim+1, buf[pos]) && buf[pos]; pos++)
++			;
++		name = buf+pos;
++		if(*name=='#' || *name=='\n' || *name==0)
++			continue;
++		for(; !strchr(delim, buf[pos]) && buf[pos]; pos++)
++			;
++		buf[pos] = 0;
++		if(!*name) continue;
++		for(pos++; strchr(delim+1, buf[pos]) && buf[pos]; pos++)
++			;
++		value = buf+pos;
++		for(; !strchr(delim, buf[pos]) && buf[pos]; pos++)
++			;
++		buf[pos] = 0;
++		if(!*value) continue;
++		switch(name[5]) {
++		case 'H':
++			if(!strcmp(name, "MysqlHost")) {
++				strncpy(host, value, SQL_BUF_SIZE);
++				mss.mysql_host = host;
++			}
++			break;
++		case 'U':
++			if(!strcmp(name, "MysqlUsername")) {
++				strncpy(user, value, SQL_BUF_SIZE);
++				mss.mysql_user = user;
++			} else if(!strcmp(name, "MysqlUserTable")) {
++				strncpy(user_table, value, SQL_BUF_SIZE);
++				mss.mysql_user_table = user_table;
++			}
++			break;
++		case 'D':
++			if(!strcmp(name, "MysqlDatabase")) {
++				strncpy(database, value, SQL_BUF_SIZE);
++				mss.mysql_database = database;
++			} 
++			break;
++		case 'M':
++			if(!strcmp(name, "MysqlMailboxTable")) {
++				strncpy(mailbox_table, value, SQL_BUF_SIZE);
++				mss.mysql_mailbox_table = mailbox_table;
++#ifdef MYSQLMAP
++			} else if(!strcmp(name, "MysqlMapTable")){
++				strncpy(map_table, value, SQL_BUF_SIZE);
++				mss.mysql_map_table = map_table;
++#endif /* MYSQLMAP */
++			}
++			break;
++		case 'A':
++			if(!strcmp(name, "MysqlAliasTable")) {
++				strncpy(alias_table, value, SQL_BUF_SIZE);
++				mss.mysql_alias_table = alias_table;
++			}
++			break;
++		case 'P':
++			if(!strcmp(name, "MysqlPassword")) {
++				strncpy(password, value, SQL_BUF_SIZE);
++				mss.mysql_passwd = password;
++			}
++			break;
++		case 'N':
++			if(!strcmp(name, "MysqlNetworkPort")) {
++				strncpy(portnum, value, SQL_BUF_SIZE);
++				mss.mysql_port = atoi(portnum);
++			}
++			break;
++		case 'S':
++			if(!strcmp(name, "MysqlSocket")) {
++				strncpy(mysql_socket, value, SQL_BUF_SIZE);
++				mss.mysql_socket = mysql_socket;
++			}
++			break;
++#ifdef MYSQLMAP
++		case 'R':
++			if(!strcmp(name, "MysqlRHSColumn")) {
++				strncpy(rhs_col, value, SQL_BUF_SIZE);
++				mss.mysql_rhs_col = rhs_col;
++			}
++			break;
++		case 'L':
++			if(!strcmp(name, "MysqlLHSColumn")) {
++				strncpy(lhs_col, value, SQL_BUF_SIZE);
++				mss.mysql_lhs_col = lhs_col;
++			}
++			break;
++#endif
++		default:
++        		sm_dprintf("Unrecognised configuration directive found: %s", name);
++			break;
++		}
++	}
++	fclose(conf);
++
++	// Validate configuration.
++	// Must have host or socket
++	// user, database, user table, alias table.
++
++	// password may be null.
++
++	// If we are using MYSQL maps, we need the default LHS and RHS columns.
++	if((mss.mysql_host || mss.mysql_socket)
++            && mss.mysql_user && /* mss.mysql_passwd && */
++		mss.mysql_database &&
++#ifdef MYSQLMAP
++		mss.mysql_lhs_col && mss.mysql_rhs_col && 
++#endif
++		mss.mysql_alias_table)
++	{
++                // If we are using MailboxDatabase = "mysql", we
++                // need mailbox_table.
++                if (!strcmp(Mbdb,"mysql") && !mss.mysql_mailbox_table) {
++                   return NULL;
++                }
++                // If we are using UserDatabase = "mysql", we
++                // need user_table.
++                if (UdbSpec && !strcmp(UdbSpec,"mysql") && !mss.mysql_user_table) {
++                   return NULL;
++                }
++
++		return &mss;
++	}
++	return NULL;
++}
++
++struct passwd * get_mysql_pwd(char * user_name)
++{
++
++	char queryBuf[256];
++
++	int queryResult = 0;
++	static struct passwd pw;
++	mysql_init(&ml_mysql);
++	mysqlconf = get_mysql_conf();
++	if(mysqlconf == NULL)
++	{
++		return NULL;
++	}
++	if(!mysql_real_connect(&ml_mysql,mysqlconf->mysql_host,mysqlconf->mysql_user,mysqlconf->mysql_passwd,mysqlconf->mysql_database,mysqlconf->mysql_port,mysqlconf->mysql_socket,0))
++	{
++		mysql_close(&ml_mysql);
++		return NULL;
++	}
++	snprintf(queryBuf, sizeof(queryBuf),
++			"SELECT * FROM %s WHERE username = \'%s\'",
++			mysqlconf->mysql_user_table,user_name);
++	queryResult = mysql_query(&ml_mysql,queryBuf);
++#ifdef MYSQL_VERBOSE
++	if (queryResult != 0) {
++		syslog(LOG_INFO,NOQID,"Error performing MySQL query: %s",mysql_error(&ml_mysql));
++	}
++#endif
++	if((result=mysql_store_result(&ml_mysql)) == NULL)
++	{
++		return NULL;
++	}
++	num_rows=mysql_num_rows(result);
++	num_fields=mysql_num_fields(result);
++	if(num_rows == 0)
++	{
++		mysql_free_result(result);
++		mysql_close(&ml_mysql);
++		return NULL;
++	}
++
++	field=mysql_fetch_row(result);
++
++	pw.pw_name = field[0];
++	pw.pw_passwd = field[1];
++	pw.pw_uid = atoi(field[2]);
++	pw.pw_gid = atoi(field[3]);
++	if((pw.pw_gecos = field[4]) == NULL)
++		pw.pw_gecos = ",,,";
++	pw.pw_dir = field[5];
++	if((pw.pw_shell = field[6]) == NULL)
++		pw.pw_shell = "/bin/noshell";
++	mysql_free_result(result);
++	mysql_close(&ml_mysql);
++	return &pw;
++} 
++
++struct passwd * get_mysql_uid(u_long user_id)
++{
++
++	char queryBuf[256];
++
++	static struct passwd pw;
++	int queryResult;
++	mysql_init(&ml_mysql);
++	mysqlconf = get_mysql_conf();
++	if(mysqlconf == NULL)
++	{
++		return NULL;
++	}
++	if(!mysql_real_connect(&ml_mysql,mysqlconf->mysql_host,
++				mysqlconf->mysql_user,mysqlconf->mysql_passwd,
++				mysqlconf->mysql_database,mysqlconf->mysql_port,mysqlconf->mysql_socket,0))
++	{
++		mysql_close(&ml_mysql);
++		return NULL;
++	}
++	snprintf(queryBuf, sizeof(queryBuf), 
++			"SELECT * FROM %s WHERE username = \'%d\'",
++			mysqlconf->mysql_user_table,user_id);
++	queryResult = mysql_query(&ml_mysql,queryBuf);
++#ifdef MYSQL_VERBOSE
++	if (queryResult != 0) {
++		syslog(LOG_INFO,NOQID,"Error performing MySQL query: %s",mysql_error(&ml_mysql));
++	}
++#endif
++	if((result=mysql_store_result(&ml_mysql)) == NULL)
++	{
++		return NULL;
++	}
++	num_rows=mysql_num_rows(result);
++	num_fields=mysql_num_fields(result);
++	if(num_rows == 0)
++	{
++		mysql_free_result(result);
++		mysql_close(&ml_mysql);
++		return NULL;
++	}
++
++	field=mysql_fetch_row(result);
++
++	pw.pw_name = field[0];
++	pw.pw_passwd = field[1];
++	pw.pw_uid = atoi(field[2]);
++	pw.pw_gid = atoi(field[3]);
++	if((pw.pw_gecos = field[4]) == NULL)
++		pw.pw_gecos = ",,,";
++	pw.pw_dir = field[5];
++	if((pw.pw_shell = field[6]) == NULL)
++		pw.pw_shell = "/bin/noshell";
++	mysql_free_result(result);
++	mysql_close(&ml_mysql);
++	return &pw;
++}
+diff -urN sendmail-8.12.11-dist/mail.local/mysql_local.h sendmail-8.12.11/mail.local/mysql_local.h
+--- sendmail-8.12.11-dist/mail.local/mysql_local.h	1970-01-01 01:00:00.000000000 +0100
++++ sendmail-8.12.11/mail.local/mysql_local.h	2004-02-08 16:27:24.460318582 +0000
+@@ -0,0 +1,24 @@
++#include <pwd.h>
++#include <sys/types.h>
++#include <mysql.h>
++
++struct mysql_sendmail_struct
++{
++        char            *mysql_host;
++        char            *mysql_socket;
++        int             mysql_port;
++        char            *mysql_user;
++        char            *mysql_passwd;
++        char            *mysql_database;
++        char            *mysql_user_table;
++        char            *mysql_mailbox_table;
++        char            *mysql_alias_table;
++        char            *mysql_map_table;
++        char            *mysql_lhs_col;
++        char            *mysql_rhs_col;
++
++};
++
++struct passwd *get_mysql_pwd(char *user_name);
++struct passwd *get_mysql_uid(u_long user_id);
++struct mysql_sendmail_struct *get_mysql_conf();
+diff -urN sendmail-8.12.11-dist/sendmail/alias.c sendmail-8.12.11/sendmail/alias.c
+--- sendmail-8.12.11-dist/sendmail/alias.c	2003-10-06 21:43:29.000000000 +0100
++++ sendmail-8.12.11/sendmail/alias.c	2004-02-08 16:27:24.461318366 +0000
+@@ -12,6 +12,8 @@
+  */
+ 
+ #include <sendmail.h>
++#include <sendmail/sm_mysql.h>
++extern char *get_mysql_alias(char *mysql_name, int *status);
+ 
+ SM_RCSID("@(#)$Id: sendmail+mysql-8.12.11-7.patch,v 1.1 2004/02/26 16:58:52 root Exp root $")
+ 
+@@ -115,6 +117,20 @@
+ 		return;
+ 	}
+ 	if (p == NULL)
++        {
++                if (tTd(27,4)) {
++                   sm_dprintf("Checking for mysql aliases (%s).\n",a->q_user);
++                }
++                p = get_mysql_alias(a->q_user, &status);
++                if (status == EX_TEMPFAIL || status == EX_UNAVAILABLE)
++                {
++                        a->q_flags |= QS_QUEUEUP;
++                        if (e->e_message == NULL)
++                                e->e_message = newstr("MySQL alias database unavailable");
++			return;
++                }
++        }
++	if (p == NULL)
+ 		return;
+ 
+ 	/*
+@@ -170,6 +186,7 @@
+ 		(void) sm_strlcpyn(obuf, sizeof obuf, 2, "owner-", a->q_user);
+ 	owner = aliaslookup(obuf, &status, a->q_host);
+ 	if (owner == NULL)
++	if((owner = get_mysql_alias(obuf, &status)) == NULL)
+ 		return;
+ 
+ 	/* reflect owner into envelope sender */
+diff -urN sendmail-8.12.11-dist/sendmail/conf.c sendmail-8.12.11/sendmail/conf.c
+--- sendmail-8.12.11-dist/sendmail/conf.c	2004-01-08 21:54:55.000000000 +0000
++++ sendmail-8.12.11/sendmail/conf.c	2004-02-08 16:27:24.534302577 +0000
+@@ -639,6 +639,11 @@
+ 	MAPDEF("arith", NULL, 0,
+ 		dequote_init, null_map_open, null_map_close,
+ 		arith_map_lookup, null_map_store);
++#ifdef MYSQLMAP
++        MAPDEF("mysql", NULL, 0,
++                mysql_map_parseargs, mysql_map_open, mysql_map_close,
++                mysql_map_lookup, null_map_store);
++#endif
+ 
+ 	if (tTd(38, 2))
+ 	{
+@@ -5540,6 +5545,12 @@
+ # if DNSMAP
+ 	"DNSMAP",
+ # endif /* DNSMAP */
++# if MYSQLMAP
++       "MYSQLMAP",
++# endif /* MYSQLMAP */
++# if UDBMYSQL
++       "UDBMYSQL",
++# endif /* UDBMYSQL */
+ #endif /* NAMED_BIND */
+ #if EGD
+ 	"EGD",
+diff -urN sendmail-8.12.11-dist/sendmail/Makefile.m4 sendmail-8.12.11/sendmail/Makefile.m4
+--- sendmail-8.12.11-dist/sendmail/Makefile.m4	2002-09-09 03:48:54.000000000 +0100
++++ sendmail-8.12.11/sendmail/Makefile.m4	2004-02-08 16:27:24.535302361 +0000
+@@ -5,8 +5,9 @@
+ bldPRODUCT_START(`executable', `sendmail')
+ define(`bldBIN_TYPE', `G')
+ define(`bldINSTALL_DIR', `')
+-define(`bldSOURCES', `main.c alias.c arpadate.c bf.c collect.c conf.c control.c convtime.c daemon.c deliver.c domain.c envelope.c err.c headers.c macro.c map.c mci.c milter.c mime.c parseaddr.c queue.c readcf.c recipient.c sasl.c savemail.c sfsasl.c shmticklib.c sm_resolve.c srvrsmtp.c stab.c stats.c sysexits.c timers.c tls.c trace.c udb.c usersmtp.c util.c version.c ')
++define(`bldSOURCES', `main.c alias.c arpadate.c bf.c collect.c conf.c control.c convtime.c daemon.c deliver.c domain.c envelope.c err.c headers.c macro.c map.c mci.c milter.c mime.c parseaddr.c queue.c readcf.c recipient.c sasl.c savemail.c sfsasl.c shmticklib.c sm_resolve.c srvrsmtp.c stab.c stats.c sysexits.c timers.c tls.c trace.c udb.c usersmtp.c util.c version.c mysql_sendmail.c ')
+ PREPENDDEF(`confENVDEF', `confMAPDEF')
++APPENDDEF(`confMAPDEF', `-DMYSQLMAP')
+ bldPUSH_SMLIB(`sm')
+ bldPUSH_SMLIB(`smutil')
+ 
+diff -urN sendmail-8.12.11-dist/sendmail/map.c sendmail-8.12.11/sendmail/map.c
+--- sendmail-8.12.11-dist/sendmail/map.c	2003-07-24 19:24:17.000000000 +0100
++++ sendmail-8.12.11/sendmail/map.c	2004-02-08 16:27:24.568295224 +0000
+@@ -7399,3 +7399,424 @@
+ 	*statp = EX_CONFIG;
+ 	return NULL;
+ }
++
++
++/* ########## MySQL MAP #################### */
++
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <mysql/mysql.h>
++#include <sendmail/sm_mysql.h>
++
++MYSQL mysql;
++MYSQL_RES *sql_result;
++my_ulonglong num_rows;
++MYSQL_ROW field;
++my_ulonglong num_fields;
++char *result;
++
++MYSQLMAP_STRUCT *mysqlmap;
++
++mysql_map_open(map, mode)
++        MAP *map;
++        int mode;
++{
++
++      mysqlmap = (MYSQLMAP_STRUCT *) map->map_db1;
++      mysql_init(&mysql);
++
++      if(!mysql_real_connect(&mysql,mysqlmap->mysql_host,mysqlmap->mysql_user,mysqlmap->mysql_passwd,mysqlmap->mysql_database,mysqlmap->mysql_port,mysqlmap->mysql_socket,0))
++      {
++                sm_syslog(LOG_INFO, NOQID,
++                "Connection to MySQL server failed(%s)",mysql_error(&mysql));
++                mysql_close(&mysql);
++              return false;
++      }
++      if (tTd(38, 2)) {
++                sm_dprintf("mysql_map_open(%s, %d)\n", map->map_mname,mode);
++                sm_dprintf("Connecting to MySQL server(%s)\n",mysqlmap->mysql_host);
++      }
++
++        mode &= O_ACCMODE;
++//         if (mode != O_RDONLY)
++//         {
++//                 return false;
++//         }
++        return true;
++
++}
++int mysql_map_close(map)
++{
++   if (tTd(38,9))
++   {
++        sm_dprintf("Disconnecting from MySQL server\n");
++
++   }
++   SM_TRY
++      mysql_close(&mysql);
++   SM_EXCEPT(exc,"[!F]*")
++      /* catch all exceptions */
++      sm_exc_print(exc, smioout);
++   SM_FINALLY
++      return 1;
++   SM_END_TRY
++   return 0;
++}
++
++char *mysql_map_lookup(map, name, av, statp)
++        MAP *map;
++        char *name;
++        char **av;
++        int *statp;
++
++{
++	int queryResult = 0;
++        MYSQLMAP_STRUCT *mysqlmap = NULL;
++        char keybuf[MAXNAME + 1];
++	char mysqlkeybuf[((MAXNAME+1)*2+1)];
++      int name_len;
++      char queryBuf[SQL_BUF_SIZE];
++
++   if (!bitset(MF_NOFOLDCASE, map->map_mflags))
++      makelower(name);
++
++      if (tTd(39, 20))
++                sm_dprintf("mysql_map_lookup(%s, %s)\n", map->map_mname, name);
++      if(!mysql_map_open(map))
++      {
++                sm_syslog(LOG_INFO, NOQID,"Error connecting to server for %s map lookup.",map->map_mname);
++                mysql_close(&mysql);
++                *statp = EX_TEMPFAIL;
++                return NULL;
++      }
++      mysqlmap = (MYSQLMAP_STRUCT *) map->map_db1;
++      name_len = strlen(name);
++        if (name_len > MAXNAME)
++                name_len = MAXNAME;
++        strncpy(keybuf, name, name_len);
++        keybuf[name_len] = '\0';
++
++        if (tTd(39, 20))
++	        sm_dprintf("Looking up '%s' in '%s' table\n",keybuf,mysqlmap->mysql_map_table);
++        mysql_real_escape_string(&mysql,(char *)mysqlkeybuf,keybuf,strlen(keybuf));
++
++       snprintf(queryBuf, sizeof(queryBuf), "select %s from %s where %s = \'%s\'",mysqlmap->mysql_rhs_col,mysqlmap->mysql_map_table,mysqlmap->mysql_lhs_col,(char *)mysqlkeybuf);
++	queryResult = mysql_query(&mysql,queryBuf);
++  	if (tTd(39, 20)) {
++  	   if (queryResult != 0) { /* Non-zero if the query failed. */
++             sm_dprintf("Error performing MySQL query: %s\n",mysql_error(&mysql));
++	      sm_dprintf("select %s from %s where %s = \'%s\'\n",mysqlmap->mysql_rhs_col,mysqlmap->mysql_map_table,mysqlmap->mysql_lhs_col,keybuf);
++	      *statp = EX_TEMPFAIL;
++	      return NULL;
++          }
++      }
++      sql_result = mysql_store_result(&mysql); 
++      if (sql_result == NULL)
++      {
++ 	  sm_syslog(LOG_INFO, NOQID,"Error fetching query result from server: %s",mysql_error(&mysql));
++              mysql_close(&mysql);
++                *statp = EX_TEMPFAIL;
++              return NULL;
++      }
++      num_rows=mysql_num_rows(sql_result);
++      if(num_rows == 0)
++      {
++         if (tTd(39, 20)) {
++
++              sm_dprintf("No match for '%s' found...\n",keybuf);
++
++         }
++         result = NULL;
++         *statp = EX_NOTFOUND;
++         goto mysqlexit;
++      }
++
++      SM_TRY
++
++      field=mysql_fetch_row(sql_result);
++
++      // I Think mysql_free_result is whacking the pointer's contents,
++      // so we have to malloc() and strcpy this value to prevent this.
++      result=malloc(strlen(field[0])+2);
++      strcpy(result,field[0]);
++
++      // result = field[0];
++      *statp = EX_OK;
++      if (tTd(39, 20)) {
++
++         sm_dprintf("Found, rewriting to: %s\n", field[0]);
++
++      }
++	SM_EXCEPT(exc,"[!F]*")
++	 	sm_syslog(LOG_INFO,NOQID,"Exception raised in mysql_map_lookup() while rewriting.");
++	SM_END_TRY
++
++mysqlexit: 
++	SM_TRY
++      if(sql_result != NULL)
++      {
++              mysql_free_result(sql_result);
++      }
++      mysql_map_close(map);
++	SM_EXCEPT(exc,"[!F]*")
++	 	sm_syslog(LOG_INFO,NOQID,"Exception raised in mysql_map_lookup()");
++	SM_END_TRY
++
++      if(!result)
++              return NULL;
++
++      if (bitset(MF_MATCHONLY, map->map_mflags))
++              return map_rewrite(map, result, strlen(result), NULL);
++      else
++              return map_rewrite(map, result, strlen(result), av);
++  if (tTd(39, 20)) {
++      sm_dprintf("Reached the end of mysql_map_lookup(), without returning a result.\n");
++  }
++//    return result;
++
++}
++
++char *
++mysql_map_dequote(str)
++        char *str;
++{
++        char *p;
++        char *start;
++        p = str;
++
++        if (*p == '"')
++        {
++                start = ++p;
++        }
++        else
++        {
++                return(str);
++        }
++        while (*p != '"' && *p != '\0')
++        {
++                p++;
++        }
++        if (*p != '\0')
++                *p = '\0';
++        return start;
++}
++
++// #endif
++bool mysql_map_parseargs(map,args)
++        MAP *map;
++        char *args;
++
++{
++
++      MYSQLMAP_STRUCT *mysqlmap_conf;
++
++        register char *p = args;
++        register int done;
++      if((mysqlmap_conf  = get_mysql_conf()) == NULL)
++      {
++              
++              sm_syslog(LOG_INFO, NOQID,"Error reading config file");
++              return false;
++      }
++        mysqlmap  = (MYSQLMAP_STRUCT *) xalloc(sizeof(MYSQLMAP_STRUCT));
++
++      memcpy(mysqlmap,mysqlmap_conf,sizeof(MYSQLMAP_STRUCT));
++
++              map->map_mflags |= MF_TRY0NULL | MF_TRY1NULL;
++        for (;;)
++        {
++                while (isascii(*p) && isspace(*p))
++                        p++;
++                if (*p != '-')
++                        break;
++                switch (*++p)
++                {
++                  case 'N':
++                        map->map_mflags |= MF_INCLNULL;
++                        map->map_mflags &= ~MF_TRY0NULL;
++                        break;
++
++                  case 'O':
++                        map->map_mflags &= ~MF_TRY1NULL;
++                        break;
++
++                  case 'o':
++
++                        map->map_mflags |= MF_OPTIONAL;
++                        break;
++
++                  case 'f':
++                        map->map_mflags |= MF_NOFOLDCASE;
++                        break;
++
++                  case 'm':
++                        map->map_mflags |= MF_MATCHONLY;
++                        break;
++
++                  case 'A':
++                        map->map_mflags |= MF_APPEND;
++                        break;
++
++                  case 'q':
++                        map->map_mflags |= MF_KEEPQUOTES;
++                        break;
++
++                  case 't':
++                        map->map_mflags |= MF_NODEFER;
++                        break;
++
++                  case 'a':
++                        map->map_app = ++p;
++                        break;
++                  case 'T':
++                        map->map_tapp = ++p;
++                        break;
++
++                  case 'H':             /* mysql host */
++                        while (isascii(*++p) && isspace(*p))
++                                continue;
++                        map->map_domain = p;
++                        mysqlmap->mysql_host = p;
++                        break;
++
++                  case 'S':             /* mysql socket */
++                        while (isascii(*++p) && isspace(*p))
++                                continue;
++                        map->map_domain = p;
++                        mysqlmap->mysql_socket = p;
++                        break;
++
++                  case 'D':             /* mysql database */
++                        while (isascii(*++p) && isspace(*p))
++                                continue;
++                        mysqlmap->mysql_database = p;
++                        break;
++
++
++                  case 'M':             /* mysql map table */
++                        while (isascii(*++p) && isspace(*p))
++                                continue;
++                        mysqlmap->mysql_map_table = p;
++                        break;
++
++                  case 'P':             /* mysql passwd */
++                        while (isascii(*++p) && isspace(*p))
++                                continue;
++                        mysqlmap->mysql_passwd = p;
++                        break;
++
++                  case 'U':             /* mysql username */
++                        while (isascii(*++p) && isspace(*p))
++                                continue;
++                        mysqlmap->mysql_user = p;
++                        break;
++
++                  case 'L':             /* mysql LHS table */
++                        while (isascii(*++p) && isspace(*p))
++                                continue;
++                        mysqlmap->mysql_lhs_col = p;
++                        break;
++
++                  case 'R':             /* mysql RHS table */
++                        while (isascii(*++p) && isspace(*p))
++                                continue;
++                        mysqlmap->mysql_rhs_col = p;
++                        break;
++              
++              }
++                /* need to account for quoted strings here arggg... */
++                done =  isascii(*p) && isspace(*p);
++                while (*p != '\0' && !done)
++                {
++                        if (*p == '"')
++                        {
++                                while (*++p != '"' && *p != '\0')
++                                {
++                                        continue;
++                                }
++                                if (*p != '\0')
++                                        p++;
++                        }
++                        else
++                        {
++                                p++;
++                        }
++                        done = isascii(*p) && isspace(*p);
++                }
++
++                if (*p != '\0')
++                        *p++ = '\0';
++      }
++        if (map->map_app != NULL)
++                map->map_app = newstr(mysql_map_dequote(map->map_app));
++        if (map->map_tapp != NULL)
++                map->map_tapp = newstr(mysql_map_dequote(map->map_tapp));
++        if (map->map_domain != NULL)
++                map->map_domain = newstr(mysql_map_dequote(map->map_domain));
++
++
++        if (mysqlmap->mysql_host != NULL) {
++              mysqlmap->mysql_host = newstr(mysql_map_dequote(mysqlmap->mysql_host));
++        } else if (mysqlmap->mysql_socket == NULL) {
++                syserr("MySQL map: -H for Host or -S for Socket is required");
++              sm_syslog(LOG_INFO, NOQID,"Error getting server hostname");
++              return false;
++      }
++        if (mysqlmap->mysql_user != NULL)
++              mysqlmap->mysql_user = newstr(mysql_map_dequote(mysqlmap->mysql_user));
++      else {
++                syserr("MySQL map: Username is required");
++                              sm_syslog(LOG_INFO, NOQID,"Error getting databse username");
++                return false;
++      }
++//        if (mysqlmap->mysql_passwd != NULL)
++//                mysqlmap->mysql_passwd = newstr(mysql_map_dequote(mysqlmap->mysql_passwd));
++//    else {
++//                syserr("MySQL map: -P for Password is required");
++//                sm_syslog(LOG_INFO, NOQID,"Error getting database password");
++//                return false;
++//    }
++        if (mysqlmap->mysql_database != NULL)
++                mysqlmap->mysql_database = newstr(mysql_map_dequote(mysqlmap->mysql_database));
++      else {
++                syserr("MySQL map: -D for Database name is required");
++                sm_syslog(LOG_INFO, NOQID,"Error getting database name");
++                return false;
++      }
++        if (mysqlmap->mysql_map_table != NULL)
++                mysqlmap->mysql_map_table = newstr(mysql_map_dequote(mysqlmap->mysql_map_table));
++      else {
++                syserr("MySQL map: -M for Map table is required");
++                sm_syslog(LOG_INFO, NOQID,"Error getting map table name");
++                return false;
++      }
++
++
++        if (mysqlmap->mysql_lhs_col != NULL)
++                mysqlmap->mysql_lhs_col = newstr(mysql_map_dequote(mysqlmap->mysql_lhs_col));
++      else {
++                syserr("MySQL map: -L for LHS column is required");
++                sm_syslog(LOG_INFO, NOQID,"Error getting RHS column  name");
++                return false;
++      }
++
++        if (mysqlmap->mysql_rhs_col != NULL)
++                mysqlmap->mysql_rhs_col = newstr(mysql_map_dequote(mysqlmap->mysql_rhs_col));
++      else {
++                syserr("MySQL map: -R for RHS column is required");
++                sm_syslog(LOG_INFO, NOQID,"Error getting RHS column name");
++                return false;
++      }
++
++	if (tTd(37,4)) {
++      	   sm_syslog(LOG_INFO,NOQID,"Map class '%s' configured for columns %s -> %s, table %s, database %s, user %s, host %s/socket %s",
++  		map->map_mname, mysqlmap->mysql_lhs_col,
++  		mysqlmap->mysql_rhs_col, mysqlmap->mysql_map_table,
++  		mysqlmap->mysql_database, mysqlmap->mysql_user,
++  		mysqlmap->mysql_host,mysqlmap->mysql_socket);
++	}
++
++        map->map_db1 = (ARBPTR_T) mysqlmap;
++      return true;
++}
+diff -urN sendmail-8.12.11-dist/sendmail/mysql_sendmail.c sendmail-8.12.11/sendmail/mysql_sendmail.c
+--- sendmail-8.12.11-dist/sendmail/mysql_sendmail.c	1970-01-01 01:00:00.000000000 +0100
++++ sendmail-8.12.11/sendmail/mysql_sendmail.c	2004-02-08 16:27:24.570294791 +0000
+@@ -0,0 +1,375 @@
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <mysql/mysql.h>
++#include <sendmail/sm_mysql.h>
++#include <sendmail.h>
++
++#define SQL_CONF_FILE	"/etc/mail/sqlmail.conf"
++#define SQL_BUF_SIZE	128
++#define false 		0
++#define true		1
++
++MYSQL mysql;
++MYSQL_RES *result;
++my_ulonglong num_rows;
++my_ulonglong num_fields;
++char *mysql_alias;
++MYSQL_ROW field;
++MAP *map;
++char *name;
++struct mysql_sendmail_struct *mysqlconf;
++struct password *pw;
++
++char *get_mysql_alias(char *tmpname, int *status)
++{
++char mysql_name[(strlen(tmpname)*2+1)];
++char queryBuf[SQL_BUF_SIZE];
++int queryResult = 0;
++
++  mysql_init(&mysql);
++  mysqlconf=get_mysql_conf();
++  if(mysqlconf == NULL)
++  {
++	sm_syslog(LOG_INFO, NOQID,"Error reading config file (%s)",SQL_CONF_FILE);
++	return NULL;
++  }
++  if(!mysql_real_connect(&mysql,mysqlconf->mysql_host,mysqlconf->mysql_user,mysqlconf->mysql_passwd,mysqlconf->mysql_database,mysqlconf->mysql_port,mysqlconf->mysql_socket,0))
++  {
++                sm_syslog(LOG_INFO, NOQID,
++                "Connection to MySQL server failed(%s)",mysql_error(&mysql));
++                mysql_close(&mysql);
++                return NULL;
++  }
++  mysql_real_escape_string(&mysql,(char *)mysql_name,tmpname,strlen(tmpname));
++  snprintf(queryBuf, sizeof(queryBuf),
++		"select %s from %s where %s = \'%s\'", mysqlconf->mysql_rhs_col,
++		mysqlconf->mysql_alias_table,mysqlconf->mysql_lhs_col,&mysql_name);
++if (tTd(27, 4)) {
++
++  sm_syslog(LOG_INFO, NOQID,"Looking up %s in alias table",mysql_name);
++  
++}
++  queryResult = mysql_query(&mysql,queryBuf);
++  if (tTd(27, 4)) {
++     if (queryResult != 0) {
++        sm_syslog(LOG_INFO,NOQID,"Error performing MySQL query: %s",mysql_error(&mysql));
++     }
++  }
++  result=mysql_store_result(&mysql);
++  if(result == NULL)
++  {
++	sm_syslog(LOG_INFO, NOQID,"Error fetching query result from server: %s",mysql_error(&mysql));
++	*status = EX_TEMPFAIL;
++        mysql_free_result(result);
++        mysql_close(&mysql);
++	return NULL;
++  }
++  num_rows=mysql_num_rows(result);
++  if(num_rows == 0)
++  {
++  if (tTd(27, 4)) {
++
++        sm_syslog(LOG_INFO, NOQID,"Not found...");
++
++  }
++  	 mysql_free_result(result);
++         mysql_close(&mysql);
++         return NULL;
++  }
++  field = mysql_fetch_row(result);
++  mysql_alias = field[0];
++  if (tTd(27, 4)) {
++
++  sm_syslog(LOG_INFO, NOQID,"Found, aliased to: %s\n",mysql_alias);
++
++  }
++  mysql_free_result(result);
++  mysql_close(&mysql);
++  return mysql_alias;
++}
++
++
++struct mysql_sendmail_struct *get_mysql_conf() {
++	static struct mysql_sendmail_struct mss;
++	static char host[SQL_BUF_SIZE], user[SQL_BUF_SIZE], password[SQL_BUF_SIZE],
++		database[SQL_BUF_SIZE], user_table[SQL_BUF_SIZE],
++		alias_table[SQL_BUF_SIZE], map_table[SQL_BUF_SIZE],
++		lhs_col[SQL_BUF_SIZE],rhs_col[SQL_BUF_SIZE],
++		mailbox_table[SQL_BUF_SIZE],mysql_socket[SQL_BUF_SIZE];
++
++	char buf[256];
++	char *name, *value;
++	int  pos;
++	char *delim = "\n \t";
++	FILE *conf;
++	extern char *Mbdb;
++	EXTERN char *UdbSpec;
++
++	mss.mysql_host = NULL;
++	mss.mysql_user = NULL;
++	mss.mysql_passwd = NULL;
++	mss.mysql_database = NULL;
++	mss.mysql_user_table = NULL;
++	mss.mysql_map_table = NULL;
++	mss.mysql_mailbox_table = NULL;
++	mss.mysql_rhs_col = NULL;
++	mss.mysql_lhs_col = NULL;
++	mss.mysql_socket = NULL;
++	mss.mysql_port = 0;
++
++	if(!(conf = fopen(SQL_CONF_FILE, "r"))) {
++		/* Could not open config file */
++		return NULL;
++       }
++	while(fgets(buf, 256, conf)) {
++		for(pos=0; strchr(delim+1, buf[pos]) && buf[pos]; pos++)
++			;
++		name = buf+pos;
++		if(*name=='#' || *name=='\n' || *name==0)
++			continue;
++		for(; !strchr(delim, buf[pos]) && buf[pos]; pos++)
++			;
++		buf[pos] = 0;
++		if(!*name) continue;
++		for(pos++; strchr(delim+1, buf[pos]) && buf[pos]; pos++)
++			;
++		value = buf+pos;
++		for(; !strchr(delim, buf[pos]) && buf[pos]; pos++)
++			;
++		buf[pos] = 0;
++		if(!*value) continue;
++		switch(name[5]) {
++		case 'H':
++			if(!strcmp(name, "MysqlHost")) {
++				strncpy(host, value, SQL_BUF_SIZE);
++				mss.mysql_host = host;
++			}
++			break;
++		case 'U':
++			if(!strcmp(name, "MysqlUsername")) {
++				strncpy(user, value, SQL_BUF_SIZE);
++				mss.mysql_user = user;
++			} else if(!strcmp(name, "MysqlUserTable")) {
++				strncpy(user_table, value, SQL_BUF_SIZE);
++				mss.mysql_user_table = user_table;
++			}
++			break;
++		case 'D':
++			if(!strcmp(name, "MysqlDatabase")) {
++				strncpy(database, value, SQL_BUF_SIZE);
++				mss.mysql_database = database;
++			} 
++			break;
++		case 'A':
++			if(!strcmp(name, "MysqlAliasTable")) {
++				strncpy(alias_table, value, SQL_BUF_SIZE);
++				mss.mysql_alias_table = alias_table;
++			}
++			break;
++		case 'P':
++			if(!strcmp(name, "MysqlPassword")) {
++				strncpy(password, value, SQL_BUF_SIZE);
++				mss.mysql_passwd = password;
++			}
++			break;
++		case 'S':
++			if(!strcmp(name, "MysqlSocket")) {
++				strncpy(mysql_socket, value, SQL_BUF_SIZE);
++				mss.mysql_socket = mysql_socket;
++			}
++			break;
++		case 'M':
++			if(!strcmp(name, "MysqlMailboxTable")){
++				strncpy(mailbox_table, value, SQL_BUF_SIZE);
++				mss.mysql_mailbox_table = mailbox_table;
++#ifdef MYSQLMAP
++			} else if(!strcmp(name, "MysqlMapTable")){
++				strncpy(map_table, value, SQL_BUF_SIZE);
++				mss.mysql_map_table = map_table;
++#endif /* MYSQLMAP */
++			}
++			break;
++#ifdef MYSQLMAP
++		case 'R':
++			if(!strcmp(name, "MysqlRHSColumn")) {
++				strncpy(rhs_col, value, SQL_BUF_SIZE);
++				mss.mysql_rhs_col = rhs_col;
++			}
++			break;
++		case 'L':
++			if(!strcmp(name, "MysqlLHSColumn")) {
++				strncpy(lhs_col, value, SQL_BUF_SIZE);
++				mss.mysql_lhs_col = lhs_col;
++			}
++			break;
++#endif
++		default:
++        		sm_syslog(LOG_INFO, NOQID,"Unrecognised configuration directive found: %s\n", name);
++			break;
++		}
++	}
++	fclose(conf);
++
++        // Validate configuration.
++        // Must have host or socket
++        // user, database, user table, alias table.
++                                                                                
++        // password may be null.
++                                                                                
++        // If we are using MYSQL maps, we need the default LHS and RHS columns.
++
++	if((mss.mysql_host || mss.mysql_socket)
++            && mss.mysql_user && /* mss.mysql_passwd && */
++ 	    mss.mysql_database &&
++#ifdef MYSQLMAP
++		mss.mysql_lhs_col && mss.mysql_rhs_col && 
++#endif
++		mss.mysql_alias_table)
++	{
++		
++		// If we are using MailboxDatabase = "mysql", we 
++		// need mailbox_table.
++		if (!strcmp(Mbdb,"mysql") && !mss.mysql_mailbox_table) {
++		   return NULL;
++		}
++                // If we are using UserDatabase = "mysql", we
++                // need user_table.
++                if (UdbSpec && !strcmp(UdbSpec,"mysql") && !mss.mysql_user_table) {
++                   return NULL;
++                }
++		return &mss;
++
++	}
++	return NULL;
++}
++
++
++struct passwd *get_mysql_pwd(char * user_name)
++{
++
++char mysql_name[ (strlen(user_name)*2+1)];
++char queryBuf[SQL_BUF_SIZE];
++int queryResult;
++SM_MBDB_T *mbdb_user;
++	
++	mysql_init(&mysql);
++	mysqlconf = get_mysql_conf();
++  	if(mysqlconf == NULL)
++  	{
++        	sm_syslog(LOG_INFO, NOQID,"Error reading SQL map config file (%s)", SQL_CONF_FILE);
++        	return NULL;
++  	}
++		if(!mysql_real_connect(&mysql,mysqlconf->mysql_host,mysqlconf->mysql_user,mysqlconf->mysql_passwd,mysqlconf->mysql_database,mysqlconf->mysql_port,mysqlconf->mysql_socket,0))
++	{
++                sm_syslog(LOG_INFO, NOQID,
++                "Connection to MySQL server(%s) failed\n",mysql_error(&mysql));
++		mysql_close(&mysql);
++		return NULL;
++	}
++  mysql_real_escape_string(&mysql,(char *)mysql_name,user_name,strlen(user_name));
++	snprintf(queryBuf, sizeof(queryBuf), "select * from %s where username = \'%s\'",mysqlconf->mysql_user_table,&mysql_name);
++       if (tTd(28,4)) {
++
++	   sm_dprintf("Looking up %s in user table\n",mysql_name);
++
++ 	}
++       queryResult = mysql_query(&mysql,queryBuf);
++       if (tTd(28,4)) {
++          if (queryResult != 0) {
++             sm_dprintf("Error performing MySQL query: %s",mysql_error(&mysql));
++          }
++       }
++	if((result=mysql_store_result(&mysql)) == NULL)
++	{
++		sm_syslog(LOG_INFO, NOQID,"Error sending query to server");
++		mysql_close(&mysql);
++		return NULL;
++	}
++	num_rows=mysql_num_rows(result);
++	num_fields=mysql_num_fields(result);
++	if(num_rows == 0)
++	{
++	        if (tTd(28,4)) {
++		   sm_dprintf("Not found...\n");
++	        }
++		mysql_free_result(result);
++		mysql_close(&mysql);
++		return NULL;
++	}
++
++	field=mysql_fetch_row(result);
++
++       if (tTd(28,4)) {
++	   sm_dprintf("Found, local user: %s\n",user_name);
++	}
++
++(void) sm_strlcpy(mbdb_user->mbdb_name, field[0], sizeof(mbdb_user->mbdb_name));
++// pw.pw_passwd = field[1]; - Gone in Sendmail 8.12.9?
++(void) sm_strlcpy((char *)mbdb_user->mbdb_uid, field[2], sizeof(mbdb_user->mbdb_uid));
++(void) sm_strlcpy((char *)mbdb_user->mbdb_gid, field[3], sizeof(mbdb_user->mbdb_gid));
++if(field[4] == NULL) 
++  (void) sm_strlcpy(mbdb_user->mbdb_fullname,",,,", sizeof(mbdb_user->mbdb_fullname));
++else
++  (void) sm_strlcpy(mbdb_user->mbdb_fullname, field[4], sizeof(mbdb_user->mbdb_fullname));
++(void) sm_strlcpy(mbdb_user->mbdb_homedir, field[5], sizeof(mbdb_user->mbdb_homedir));
++if(field[6] == NULL)
++  (void) sm_strlcpy(mbdb_user->mbdb_shell,"/bin/noshell",sizeof(mbdb_user->mbdb_shell));
++else
++  (void) sm_strlcpy(mbdb_user->mbdb_shell, field[6], sizeof(mbdb_user->mbdb_shell));
++
++mysql_free_result(result);
++mysql_close(&mysql);
++return &pw;
++} 
++
++/* mysqlclass()
++ * Load a class structure with the result of selecting '*' from table_name
++ */
++void mysqlclass(class, hostname, db_name, table_name)
++
++	int class;
++	const char *hostname;
++	const char *db_name;
++	const char *table_name;
++{
++       int queryResult = 0;
++	int i;
++	char queryBuf[SQL_BUF_SIZE];
++
++	mysql_init(&mysql);
++	mysqlconf = get_mysql_conf();
++	if(mysqlconf == NULL)
++	{
++		syserr("Error reading config file");
++		return;
++	}
++
++if(!mysql_real_connect(&mysql,hostname,mysqlconf->mysql_user,mysqlconf->mysql_passwd,db_name,mysqlconf->mysql_port,mysqlconf->mysql_socket,0))
++	{
++		syserr("Cannot connect to MySQL database server (%s)",hostname);
++		return;
++	}
++	snprintf(queryBuf,sizeof(queryBuf),"select * from %s",table_name);
++	queryResult = mysql_query(&mysql,queryBuf);
++	if (tTd(37,4)) {
++  	   if (queryResult != 0) {
++	     sm_syslog(LOG_INFO,NOQID,"Error performing MySQL query: %s",mysql_error(&mysql));
++	  }
++	}
++	result=mysql_store_result(&mysql);
++	if(result == NULL)
++	{
++	sm_syslog(LOG_INFO, NOQID,"Error fetching query result from server: %s",mysql_error(&mysql));
++		return;
++	}
++	num_rows=mysql_num_rows(result);
++	if(num_rows == 0)
++		return;
++	for( i = 0; i < num_rows; i++)
++	{
++		field=mysql_fetch_row(result);
++		setclass(class, field[0]);
++		mysql_field_seek(result, 0);
++	}
++}
+diff -urN sendmail-8.12.11-dist/sendmail/readcf.c sendmail-8.12.11/sendmail/readcf.c
+--- sendmail-8.12.11-dist/sendmail/readcf.c	2003-10-07 18:45:28.000000000 +0100
++++ sendmail-8.12.11/sendmail/readcf.c	2004-02-08 16:27:24.600288303 +0000
+@@ -101,6 +101,8 @@
+ 	register char *p;
+ 	long sff = SFF_OPENASROOT;
+ 	struct stat statb;
++        char *hostname, *db_name, *table_name;
++        void mysqlclass(int class, const char *hostname, const char* db_name, const char *table_name);
+ 	char buf[MAXLINE];
+ 	char exbuf[MAXLINE];
+ 	char pvpbuf[MAXLINE + MAXATOM];
+@@ -581,6 +583,59 @@
+ 			break;
+ #endif /* XLA */
+ 
++		 case 's':		/* SQL class */
++			mid = macid_parse(&bp[1], &ep);
++			for (p = ep; isascii(*p) && isspace(*p); )
++				p++;
++			if (p[0] == '-' && p[1] == 'o')
++			{
++				optional = true;
++				while (*p != '\0' && !(isascii(*p) && isspace(*p)))
++					p++;
++				while (isascii(*p) && isspace(*p))
++					p++;
++			}
++			else
++				optional = false;
++			hostname = db_name = table_name = NULL;
++			while(*p) {
++			        while(isascii(*p) && isspace(*p))
++					p++;
++				if(*p != '-') {
++					syserr("mysqlclass: invalid argument, starts with a '%c' instead of a '-'", *p);
++					while(*p != '\0' && !(isascii(*p) && isspace(*p)))
++						p++;
++					while(isascii(*p) && isspace(*p))
++						p++;
++					continue;
++				}
++				p++;
++				switch(*p) {
++				case 'H':
++					hostname = ++p;
++					break;
++				case 'D':
++					db_name = ++p;
++					break;
++				case 'T':
++					table_name = ++p;
++					break;
++				}	
++				while(*p != '\0' && !(isascii(*p) && isspace(*p)))
++					p++;
++				if(!*p)
++					continue;
++				*p = 0;
++				p++;
++			}
++					
++			if(!hostname || !db_name || !table_name) {
++				syserr("mysqlclass: missing parameters");
++				break;
++			}
++			mysqlclass(mid,hostname,db_name,table_name);
++			break;
++
+ #if defined(SUN_EXTENSIONS) && defined(SUN_LOOKUP_MACRO)
+ 		  case 'L':		/* lookup macro */
+ 		  case 'G':		/* lookup class */
+diff -urN sendmail-8.12.11-dist/sendmail/stab.c sendmail-8.12.11/sendmail/stab.c
+--- sendmail-8.12.11-dist/sendmail/stab.c	2003-03-31 18:44:24.000000000 +0100
++++ sendmail-8.12.11/sendmail/stab.c	2004-02-08 16:27:24.601288086 +0000
+@@ -33,7 +33,7 @@
+ **		can update the symbol table.
+ */
+ 
+-#define STABSIZE	2003
++#define STABSIZE	2047
+ #define SM_LOWER(c)	((isascii(c) && isupper(c)) ? tolower(c) : (c))
+ 
+ static STAB	*SymTab[STABSIZE];
+diff -urN sendmail-8.12.11-dist/sendmail/udb.c sendmail-8.12.11/sendmail/udb.c
+--- sendmail-8.12.11-dist/sendmail/udb.c	2003-04-03 17:31:00.000000000 +0100
++++ sendmail-8.12.11/sendmail/udb.c	2004-02-08 16:27:24.602287870 +0000
+@@ -31,6 +31,12 @@
+ 	size_t	size;		/* length of data */
+ };
+ # endif /* NEWDB */
++#ifdef UDBMYSQL
++#include <mysql.h>
++#include <sendmail/sm_mysql.h>
++
++struct mysql_sendmail_struct *mysqlconf;
++#endif /* UDBMYSQL */
+ 
+ /*
+ **  UDB.C -- interface between sendmail and Berkeley User Data Base.
+@@ -84,6 +90,7 @@
+ # define UDB_DBFETCH	3	/* look up in local database */
+ # define UDB_FORWARD	4	/* forward to remote host */
+ # define UDB_HESIOD	5	/* look up via hesiod */
++# define UDB_MYSQL     6       /* look up via mysql */
+ 
+ # define MAXUDBENT	10	/* maximum number of UDB entries */
+ 
+@@ -139,6 +146,12 @@
+ 	char *user;
+ 	char keybuf[MAXKEY];
+ 
++#ifdef UDBMYSQL
++	MYSQL udb_mysql;
++	MYSQL_ROW udb_field;
++	char queryBuf[SQL_BUF_SIZE];
++#endif /* UDBMYSQL */
++
+ 	memset(&key, '\0', sizeof key);
+ 	memset(&info, '\0', sizeof info);
+ 
+@@ -498,6 +511,94 @@
+ 			a->q_owner[info.size] = '\0';
+ 			break;
+ # endif /* HESIOD */
++#ifdef UDBMYSQL
++                 case UDB_MYSQL:
++			keylen = strlen(keybuf);
++			char mysqlkeybuf[(keylen*2)+1];
++
++                       if (tTd(28, 80)) {
++                               sm_dprintf("mysqlexpand: trying %s (%d) via mysql\n",
++                                       (char *) keybuf, (int) keylen);
++			}
++		       if (mysql_init(&udb_mysql) == NULL) {
++		          if (tTd(28,80)) {
++		             sm_dprintf("mysql_init() failed.");
++		          }
++		          return EX_TEMPFAIL;
++		       }
++		       mysqlconf = get_mysql_conf();
++		       if(mysqlconf == NULL)
++		       {
++		          if (tTd(28,80)) {
++		             sm_dprintf("get_mysql_conf() failed.");
++		          }
++		          return EX_TEMPFAIL;
++		       }
++  			mysql_real_escape_string(&udb_mysql,(char *)mysqlkeybuf,keybuf,strlen(keybuf));
++		       snprintf(queryBuf, sizeof(queryBuf),
++				       "SELECT * FROM %s WHERE username = \'%s\'",
++				       mysqlconf->mysql_user_table,
++					(char *)mysqlkeybuf);
++		       if (mysql_query(&udb_mysql,queryBuf) != 0) {
++		               if (tTd(28,80)) {
++				       sm_dprintf("Error performing MySQL query (%s): %s\n",mysql_error(&udb_mysql), udb_mysql.host);
++			       }
++			       mysql_close(&udb_mysql);
++			       return EX_TEMPFAIL;
++			}
++
++		       if((udb_result=mysql_store_result(&udb_mysql)) == NULL)
++		       {
++			       sm_syslog(LOG_INFO, NOQID,"Error sending query to server");
++			       mysql_close(&udb_mysql);
++			       return EX_TEMPFAIL;
++		       }
++
++		       if(mysql_num_rows(udb_result) == 0)
++		       {
++			       if (tTd(28,2)) {
++					       sm_dprintf("mysqlexpand: no match on %s (%d)\n",
++						       (char *) keybuf, (int) keylen);
++			       }
++			       mysql_free_result(udb_result);
++			       mysql_close(&udb_mysql);
++				continue;
++		       } else {
++			       udb_field=mysql_fetch_row(udb_result);
++                       if (tTd(28, 2)) {
++	                       (void) sm_strlcpyn(user, user, 2, udb_field[0], ":maildrop");
++                               sm_dprintf("mysqlexpand: match/expand %s => %s (%d)",
++					e->e_to,
++		                        shortenstring(user, MAXSHORTSTR),
++					keylen);
++			}
++                       a->q_flags &= ~QSELFREF;
++
++                        if (bitset(EF_VRFYONLY, e->e_flags))
++                        {
++                                a->q_state = QS_VERIFIED;
++                                return EX_OK;
++                        }
++                        naddrs = sendtolist(user, a, sendq, aliaslevel + 1, e);
++ 
++                        if (naddrs > 0 && !bitset(QSELFREF, a->q_flags))
++                        {
++                                if (tTd(28, 5))
++                                {
++                                        sm_dprintf("udbexpand: QS_EXPANDED ");
++                                        printaddr(a, false);
++                                }
++                                a->q_state = QS_EXPANDED;
++                        }
++
++                        memmove(a->q_owner, user, keylen);
++                        a->q_owner[keylen] = '\0';
++			}
++		       mysql_close(&udb_mysql);
++			return EX_OK;
++                      break;
++#endif /* UDBMYSQL */
++
+ 
+ 		  case UDB_REMOTE:
+ 			/* not yet implemented */
+@@ -969,6 +1070,18 @@
+ 			break;
+ # endif /* HESIOD */
+ 
++#ifdef UDBMYSQL
++                 case 'm':     /* use mysql */
++                 case 'M':
++                       if (sm_strcasecmp(spec, "mysql") != 0)
++                               goto badspec;
++                       up->udb_type = UDB_MYSQL;
++                       up->udb_pid = CurrentPid;
++                       ents++;
++                       up++;
++                       break;
++#endif /* UDBMYSQL */
++	
+ # if NEWDB
+ 		  case '/':	/* look up remote name */
+ 			l = strlen(spec);
+@@ -1081,10 +1194,17 @@
+ 			break;
+ # endif /* NEWDB */
+ 
++                  case UDB_MYSQL:
++                        sm_dprintf("UDBMYSQL\n");
++                        break;
+ 		  default:
++
+ # if HESIOD
+ badspec:
+ # endif /* HESIOD */
++#ifdef UDBMYSQL
++badspec:
++#endif
+ 			syserr("Unknown UDB spec %s", spec);
+ 			break;
+ 		}
+diff -urN sendmail-8.12.11-dist/sendmail/version.c sendmail-8.12.11/sendmail/version.c
+--- sendmail-8.12.11-dist/sendmail/version.c	2004-01-13 00:29:26.000000000 +0000
++++ sendmail-8.12.11/sendmail/version.c	2004-02-08 16:27:24.655276407 +0000
+@@ -15,4 +15,4 @@
+ 
+ SM_RCSID("@(#)$Id: sendmail+mysql-8.12.11-7.patch,v 1.1 2004/02/26 16:58:52 root Exp root $")
+ 
+-char	Version[] = "8.12.11";
++char  Version[] = "8.12.11/SQL-8.12.11-7";
+diff -urN sendmail-8.12.11-dist/sqlmail.conf sendmail-8.12.11/sqlmail.conf
+--- sendmail-8.12.11-dist/sqlmail.conf	1970-01-01 01:00:00.000000000 +0100
++++ sendmail-8.12.11/sqlmail.conf	2004-02-08 16:27:24.655276407 +0000
+@@ -0,0 +1,28 @@
++##############################################################################
++# Sendmail-SQL patch configuration file (Default MySQL options)
++#
++# See README.sendmail-sql-8.12.11-7 for details.
++##############################################################################
++##############################################################################
++# General (can largely be overriden in sendmail.cf by per map options)
++##############################################################################
++
++MysqlHost               host
++#MysqlSocket		 /var/lib/mysql/mysql.sock
++#MysqlNetworkPort        3306
++MysqlUsername           username
++MysqlPassword           password
++MysqlDatabase           database_name
++MysqlUserTable          users_table
++MysqlMailboxTable          users_table
++MysqlAliasTable         alias_table
++MysqlMapTable           default_map_table
++
++##############################################################################
++#  For the MySQL MAP only (for alias you have to define it in
++# sendmail/sm_mysql.h before you compile)
++##############################################################################
++
++MysqlLHSColumn          default_key_column
++MysqlRHSColumn          default_value_column
++

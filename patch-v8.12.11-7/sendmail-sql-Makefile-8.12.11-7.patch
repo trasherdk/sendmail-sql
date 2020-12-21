@@ -1,0 +1,27 @@
+diff -urN sendmail-8.12.11-dist/devtools/Site/site.config.m4 sendmail-8.12.11/devtools/Site/site.config.m4
+--- sendmail-8.12.11-dist/devtools/Site/site.config.m4	Thu Jan  1 01:00:00 1970
++++ sendmail-8.12.11/devtools/Site/site.config.m4	Mon Oct 30 21:21:19 2000
+@@ -11,0 +11,8 @@
++APPENDDEF(`confENVDEF', `-DUDBMYSQL -DMYSQLMAP -DPGSQLMAP -DMILTER')
++APPENDDEF(`confINCDIRS',`-I/usr/local/mysql/include/mysql -I/usr/include/mysql')
++APPENDDEF(`confLIBSEARCH', `mysqlclient')
++APPENDDEF(`confLIBDIRS', `-L/usr/lib/mysql/ -L/usr/local/mysql/lib/mysql/')
++APPENDDEF(`confLIBS',	`-lmysqlclient -lz -lpq')
++
++define(`confMANROOT', `/usr/share/man/man')
++define(`conf_mail_local_SRCADD', `mysql_local.c')
+diff -urN sendmail-8.12.11-dist/sendmail/conf.h sendmail-8.12.11/sendmail/conf.h
+--- sendmail-8.12.11-dist/sendmail/conf.h 2003-03-04 18:59:55.000000000 +0000
++++ sendmail-8.12.11/sendmail/conf.h      2003-03-04 19:00:50.000000000 +0000
+@@ -203,6 +203,10 @@
+ # define PIPELINING    1       /* SMTP PIPELINING */
+ #endif /* PIPELINING */
+
++#ifndef HASSTRERROR
++# define HASSTRERROR    1       /* Existence of strerror */
++#endif /* HASSTRERROR */
++
+ /**********************************************************************
+ **  End of site-specific configuration.
+ **********************************************************************/
+

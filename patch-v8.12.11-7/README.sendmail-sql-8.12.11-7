@@ -1,0 +1,787 @@
+Sendmail SQL README, Version 8.12.9-10
+
+
+HISTORY
+(Jonathan Yarden, Kev Green)
+
+If you use Sendmail's virtual user tables, then you know what a hassle it can
+be rebuilding the flat- file maps with makemap every time you add a new virtual
+user table entry. This gets to be just impossible when you have 10,000+
+customers using 200+ domains scattered across multiple mail exchangers.
+
+Many ISP's (Bluegrass Net included) route email for other local domains into
+one POP email account. A lot of times a customer will ask to have his/her email
+routed to another person while they are on vacation or otherwise unable to read
+their email for a period of time. This means a tech has to put a .forward file
+in (bad) or hand-edit the virtual user table (worse?) to put an entry in. Not
+pretty.
+
+Since there is the potential for multiple people to edit the same map source 
+file at the same time, there is the danger that the file will be corrupted or
+changes will be lost. Using an SQL Engine eliminates the need for hand-editing
+Sendmail map source files as a root user, with the possibility for typing
+mistakes and duplicates.
+
+NEWDB maps need to be rebuilt with makemap every time there is a change. It's
+been my experience that on a busy email server, Sendmail sometimes just locks
+up running makemap and/or does not process the changes. I have seen this
+behavior on FreeBSD, BSDi and Linux using the Berkeley DB, both the 1.85
+release and the newer versions. I don't know where the problem occurs, or
+if it's a file locking issue or what. I just know it occurs and drives me
+crazy.
+
+The overall goal was to allow general web-based control of user information in
+general (not just Sendmail map files) using a PHP-based system. Since PHP can
+use PostgreSQL, it was the obvious choice. PostgreSQL is an excellent
+general-purpose data store, you can put all sorts of things in the tables,
+not just map entries. This opened up a number of opportunities that are the
+basis of an entire reengineering of our ISP. Sendmail map files just happened
+to be an excellent place to start.
+
+Why didn't I use the LDAP map feature? For one, I'm not familiar enough with
+LDAP to make use of it. Certainly, it's probably better suited for this task
+and LDAP can be edited with PHP, but the learning curve was simply too much
+for the rest of the coders. We needed a good solution that worked and could
+be implemented quickly, but also allowed flexibility in allowing other
+information to be stored. So PostgreSQL was the choice.
+
+Subsequently, the work of Jonathan Yarden (PostgreSQL) and Paul Khavine (MySQL)
+on respective Sendmail SQL engines has been brought together in collaboration
+with Kev Green, to bring you the Sendmail SQL patch(es) that are included here,
+via the Sendmail-SQL Sourceforge project.
+
+SENDMAIL+PGSQL 
+
+WHAT IT DOES
+
+The patch adds a new map class ("pgsql") to Sendmail, which is used in the Sendmail config file (usually sendmail.cf) when specifying maps. You can continue to use other map classes as before, so it does not take away anything. I have tested and used the patch with the following maps: 
+
+mailertable
+virtusertable
+access_db
+aliases (replaces /etc/aliases)
+
+Note that I plan on working on an a "dynamic SMTP relay authorization" that
+will make more use of the "access_db" map using the "pgsql" map class in the
+future.
+
+Thanks to Sandu Mihai for letting me know that this patch can also replace
+/etc/aliases! See here for details.
+
+INSTALLATION STEPS
+
+The Sendmail-SQL patch system is currently split into three patch files, to
+give you the option of which engines to install.
+
+The sendmail-sql-Makefile-<version>-<release>.patch file is designed to add
+all of the required Makefile and Build options to the Sendmail source.
+
+The sendmail+mysql-<version>-<release>.patch file includes all of the core
+code modifications for MySQL maps/aliases/classes, and the
+sendmail+pgsql-<version>-<release>.patch file includes all of the core
+code modifications for PostgreSQL maps/aliases/classes.
+
+The PostgreSQL patch has been tested and is operating on:
+
+FreeBSD 3.3, 3.4 and 4.0
+BSDi 3.1
+Mandrake Linux 7.0
+Redhat Linux 5.2
+
+The MySQL patch has been tested and is operating on:
+
+Redhat Linux 8.0
+
+If you are using something different, then please us me know the results.
+
+POSTGRESQL PATCH INSTALLATION
+(Jonathan Yarden)
+
+You'll need to have PostgreSQL or the library and header files for PostgreSQL 
+installed on your system before you proceed. I am using version 6.5.3, so I
+don't know about other versions working. I will be installing PostgreSQL 7.0
+and testing with it in the near future. Once you have PostgreSQL 6.5.3
+installed, or it's already installed, you'll need to know the location of
+"libpq.a" and "libpq-fe.h" on your system.
+
+If you don't have the source code to Sendmail go get it from Sendmail.Org and
+untar it where you are going to build Sendmail. At the time of writing, all
+versions prior to Sendmail 8.12.9 are known to have serious security issues,
+so nobody should be running a version prior to that (unless it's had the
+relevant security fixes backported to it of course).
+
+You should apply the patch with:
+
+patch < sendmail+pgsql-<version>-<release>.patch
+
+From the directory in which you untarred the sendmail source. Provided no
+errors are reported, you should be able to proceed. If there are any reported,
+then you will need to patch them in manually (if you have to do this, please
+let us know what changes you needed to make for your OS, etc).
+
+Find out which file Sendmail is going to use as it's build file by running 
+"Build" with the "- m" option and looking at the last line of output (the
+build filename for me using Sendmail 8.9.3 is ../BuildTools/OS/Linux) 
+
+Make a copy of the build file (depending on your editor you might also need to 
+chmod 644 it before you can modify it) and append a few lines to it to enable
+the PostgreSQL maps. Change confINCDIRS and confLIBDIRS in your local copy of
+the build file to point to the directories where "libpq-fe.h" and "libpq.a"
+(or .so) are on your system.
+
+Note: These are examples only - your system build file will contains lots of 
+other stuff. You would be best served to keep the information that is currently
+in your build file and just add the definitions below into it. If you are using
+the sendmail-sql-Makefile patch, this may be able to carry out the below
+modifications for you (certainly on RedHat Linux, other OS versions possibly).
+
+   define(`confMAPDEF',`-DPGSQLMAP')
+   define(`confINCDIRS',`-I/usr/local/pgsql/include')
+   define(`confLIBDIRS',`-L/usr/local/pgsql/lib')
+   define(`confLIBS',`-lpq')
+
+(Watch out for those funky "open single quote" characters. This drove one of 
+our junior admins nuts for about an hour. It's the character on the same
+button as the tilde ("~") character.)
+
+Run Sendmail's "Build" script, specifying the copy you edited, using the 
+"-f" option. Make a note of where the "obj" directory is; you'll need to
+know this when you are ready to test.
+
+If everything goes well with the build process, you should have a copy of
+Sendmail that's capable of using PostgreSQL maps now. This feature is not
+active yet, but if you are brave you can kill Sendmail now and install this
+version using ./makesendmail install. I walked through all of these steps as
+I was writing this and I had no unexpected problems. Just make sure you have
+access to the include and library paths for PostgreSQL.
+
+MAKING IT WORK
+
+OK, so you just compiled a new Sendmail daemon. Before you install it, you need
+to test it out. I suggest making a backup copy of your current Sendmail daemon
+before installing just in case. My examples assume that you are capable of
+using the psql tool that comes with PostgreSQL to create databases and tables,
+that you know enough SQL to create tables and insert records and that you
+understand Sendmail config files. So to begin, you'll need to have access to
+a running PostgreSQL database server to make some tables in it. I'll use
+Sendmail's virtuser map for my example, but any Sendmail map can be used.
+
+If you are familiar with the Sendmail virtuser map, you know that you need two
+columns, one for the incoming email address and one for the "mapped" outgoing
+email address. So your PostgreSQL table needs at least these two columns in it,
+but you could conceivably use much more complex of a table. Here's a quickie
+table and index to test with, but it will also work for production use. You
+can cut and paste it into psql if you want:
+
+create table virtuser(emailin char(128), emailout char(128));
+create index virtuseridx on virtuser using btree(emailin);
+
+Now you should stick a few records in it using SQL that you can test with. 
+This is entirely dependent on your installation, but suffice it to say that
+you use something like:
+
+insert into virtuser (emailin,emailout) values ('testin','testout');
+
+Where testin is an incoming email address and testout is what you want it
+rewritten as. I suggest you use something that's already in your virtuser map.
+
+Change to the Sendmail "obj" directory inside the Sendmail source tree. Make a
+copy of your sendmail.cf file into this directory and edit it with your
+favorite editor. Locate the virtuser map and comment it out with a "#". Now
+you'll need to replace this map with the PostgreSQL map. Since there are too
+many variations on this, I'll show you the one I am using:
+
+# Virtual user table (maps incoming users)
+#Kvirtuser hash -o /etc/virtusertable
+Kvirtuser pgsql -c "dbname=system user=sendmail"
+ -s "select distinct emailout from virtuser where emailin='%s'"
+
+June 12, 2000
+Sandu Mihai emailed me to inform me that this patch will also handle alias
+expansions found in /etc/aliases. I gave it a test using this in my Sendmail
+config file:
+
+#replaces /etc/aliases
+Kaliases pgsql -c "dbname=system user=sendmail"
+ -s "select distinct aliasaddr from aliases where localaddr='%s'"
+
+I also commented out the lines O AliasWait=10 and O AliasFile=/etc/aliases in
+the Sendmail config file just to be sure. I tested it out and it does indeed
+work as expected. I'll leave the SQL table creation to your imagination.
+
+The key points are:
+
+The -c option specifies a PostgreSQL connect string, as documented in the
+PostgreSQL manual. You'll need to fill in whatever is appropriate for your
+system.
+
+The -s option specifies the SQL query that is to be executed. The "%s" in the
+string is replaced by the email address to be queried and must be there The
+distinct directive instructs PostgreSQL to return only the first matching row.
+It's not required but it speeds stuff up.
+
+Now you're ready to test. You'll be using Sendmail in "address test mode" using
+the "-bt" option off the command line to see if the map resolves correctly. You
+will also specify the copy of the Sendmail config file you edited to put the
+map information in. If you have never used this, it looks like this:
+
+./sendmail -bt -Csendmail.cf
+ADDRESS TEST MODE (ruleset 3 NOT automatically invoked)
+Enter <ruleset> <address>
+> 3,0 info@missing.net
+rewrite: ruleset   3   input: info @ missing . net
+rewrite: ruleset  96   input: info < @ missing . net >
+rewrite: ruleset  96 returns: info < @ missing . net . >
+rewrite: ruleset   3 returns: info < @ missing . net . >
+rewrite: ruleset   0   input: info < @ missing . net . >
+rewrite: ruleset 199   input: info < @ missing . net . >
+rewrite: ruleset 199 returns: info < @ missing . net . >
+rewrite: ruleset  98   input: info < @ missing . net . >
+rewrite: ruleset  98 returns: info < @ missing . net . >
+rewrite: ruleset 198   input: info < @ missing . net . >
+rewrite: ruleset  97   input: jyarden
+rewrite: ruleset   3   input: jyarden
+rewrite: ruleset  96   input: jyarden
+rewrite: ruleset  96 returns: jyarden
+rewrite: ruleset   3 returns: jyarden
+rewrite: ruleset   0   input: jyarden
+rewrite: ruleset 199   input: jyarden
+rewrite: ruleset 199 returns: jyarden
+rewrite: ruleset  98   input: jyarden
+rewrite: ruleset  98 returns: jyarden
+rewrite: ruleset 198   input: jyarden
+rewrite: ruleset 198 returns: $# local $: jyarden
+rewrite: ruleset   0 returns: $# local $: jyarden
+rewrite: ruleset  97 returns: $# local $: jyarden
+rewrite: ruleset 198 returns: $# local $: jyarden
+rewrite: ruleset   0 returns: $# local $: jyarden
+> ^D
+
+This shows that "info@missing.net" is mapped to the local account "jyarden"
+which just happens to be me. Ctrl-D returns you to the shell prompt. BTW, you
+can see the record of my virtuser that makes this example work below:
+
+pgsql=> select emailin, emailout from virtuser;
+emailin                       |emailout
+------------------------------+---------------------------------
+@missing.net                  |jyarden
+@whatsthis.com                |jyarden
+(2 rows)
+
+pgsql=>
+
+
+Common Problems
+
+If you get an error on Sendmail startup, it's most likely due to not having
+the proper database permissions. Check the "-c" option and make sure that you
+really have access to the database using the same parameters. psql has a lot
+of options and I am not going to go into detail on how to manage permissions
+in PostgreSQL.
+
+If you get an error on a query, check the "-s" option to make sure it looks
+correct. See if you can reproduce the error manually using psql. If you can't,
+make sure that you have permissions to access the table.
+
+If something really goes bonk, either comment out the "pgsql" map line and
+uncomment your original map line, or replace sendmail.cf with a backup copy
+(you did make a backup copy of the Sendmail config file, right?)
+
+BUILDING SENDMAIL+MYSQL.
+
+If you are reading this file, then you have probably already obtained the
+appropriate patch from http://sourceforge.net/projects/sendmail-sql/
+
+In order to build Sendmail with (My)SQL support, you will need to do roughly
+the following:
+
+tar -C <your sendmail root> -zxvf sendmail-<version>.tar.gz
+cp sendmail+mysql-<version>-<release>.patch <your sendmail root>
+cd <your sendmail root>
+patch -p1 < sendmail+mysql-<version>-<release>.patch
+cp sendmail-sql-Makefile-<version>-<release>.patch <your sendmail root>
+patch -p1 < sendmail-sql-Makefile-<version>-<release>.patch
+
+As an alternative to applying the sendmail-sql-Makefile patch, you could try
+manually editing the compile options, in for example devtools/OS/Linux. See the
+sendmail README files for the locations you can add this. Add in the following,
+with appropriate include and library paths for your own MySQL installation:
+
+   define(`confMAPDEF',`-DMYSQLMAP')
+   define(`confINCDIRS',`-I/usr/include/mysql')
+   define(`confLIBDIRS',`-L/usr/lib/mysql')
+   define(`confLIBS',`-lmysqlclient')
+
+If there are any errors that stop the patches, the you may need to retry with 
+-p0 in your patch incantation.
+
+If the patch fails due to files that do not exist, and the patch cannot add to
+them, then delete all of the sendmail source, untar it again, do
+"touch <missing file>", and then re-apply the patch.
+
+Once the patch has applied correctly, without error, then you will need to
+compile Sendmail as normal, with the "./Build" script (or with "make", for
+earlier versions of sendmail?).
+
+CONFIGURATION.
+
+The main configuration file for Sendmail-SQL is found in /etc/mail/mail.conf,
+for versions up to 8.11.2(?), and thereafter /etc/mail/sqlmail.conf.
+
+Its format is thus:
+
+#############################
+# MySQL Config for Sendmail #
+#############################
+
+MysqlHost               <mysql host>
+MysqlSocket		<local mysql server socket path>
+MysqlUsername           <mysql userame>
+MysqlPassword           <mysql password>
+MysqlDatabase           <mysql database>
+MysqlUserTable          <user table>
+MysqlMailboxTable	<mailbox table>
+MysqlAliasTable         <alias table>
+MysqlMapTable           <tables used for maps>
+MysqlLHSColumn          <lhs column for the aliases table>
+MysqlRHSColumn          <rhs column for the aliases table>
+
+Where the "user" table is equivalent to /etc/passwd under Sendmail-SQL, and
+the "alias" table is equivalent to /etc/[mail/]aliases under Sendmail-SQL,
+and the LHS and RHS are equivalent to respective sections of the aliases file.
+
+The "MysqlMapTable" defines the default table for Sendmail-SQL to try
+for a class mapping. This is optional.
+
+The MysqlHost and MysqlSocket configuration is passed directly through to
+mysql_real_connect() and as such you should refer to the definition of that
+call at mysql.com for the time being to find out the exact connection logic.
+It should in theory be that a MysqlHost of "localhost", or a no configuration
+for the MysqlHost value will use the local socket, and any non-local MysqlHost
+configuration value will result in using TCP/IP to connect to the mysql server.
+If neither the MysqlSocket nor the MysqlHost parameters are set, an error
+will be reported.
+
+The MysqlUserTable and MysqlMailboxTable refer to the mailbox and user lookup
+tables used by sendmail, see below for more details.
+
+This file should be viewed as a file defining defaults, as most of the options
+in this file can be overriden on a per class-definition basis, as below.
+
+SENDMAIL CONFIGURATION
+
+If you are using m4 to configure your sendmail implementation, then you should 
+read through all the following to work out what you are going to require, and 
+read the m4 configuration section below. If you are not using m4, then you 
+should add in the appropriate configuration directives directly into
+/etc/sendmail.cf (may be /etc/mail/sendmail.cf or other location).
+
+ALIASES CLASS
+
+The details (MysqlAliasTable, MysqlLHSColumn, MysqlRHSColumn), in the defaults
+file (/etc/mail/sqlmail.conf) define how Sendmail-SQL handles the aliases
+class.
+
+THE USER DATABASE
+
+It is possible to configure sendmail to use a MySQL table for /etc/passwd
+lookups, which can be done with a table as follows:
+
+mysql> desc users;
++----------+--------------+------+-----+---------+----------------+
+| Field    | Type         | Null | Key | Default | Extra          |
++----------+--------------+------+-----+---------+----------------+
+| username | char(32)     | YES  |     | NULL    |                |
+| passwd   | char(32)     | YES  |     | NULL    |                |
+| uid      | mediumint(9) |      | PRI | 0       | auto_increment |
+| gid      | mediumint(9) | YES  |     | NULL    |                |
+| gecos    | char(32)     | YES  |     | NULL    |                |
+| home_dir | char(32)     | YES  |     | NULL    |                |
+| shell    | char(32)     | YES  |     | NULL    |                |
+| maildrop | char(128)    | YES  |     | NULL    |                |
++----------+--------------+------+-----+---------+----------------+
+8 rows in set (0.00 sec)
+
+The following SQL will generate such a table:
+
+ create table users (
+     username CHAR(32),
+     passwd CHAR(32),
+     uid mediumint(9) not null auto_increment,
+     gid mediumint(9),
+     gecos CHAR(32),
+     home_dir CHAR(32),
+     shell CHAR(32),
+     maildrop CHAR(128),
+     PRIMARY KEY(uid)
+     );
+
+The table must be set up with fields in the same order, and of the same
+type as the above (for the time being at least). It should be safe to add
+additional fields if needs be after the required 8 fields, although this has
+not been tested.
+
+It is also possible to achieve similar with the NSS MYSQL module which is
+available from:
+
+ http://savannah.nongnu.org/projects/nss-mysql/
+
+Although it's a lot more long-winded to do it that way.
+
+Once the table has been created, and the appropriate sqlmail.conf configuration
+directives have been set up, you will need to tell sendmail to refer to the
+MySQL database, rather than /etc/passwd for user lookups.
+
+This is achieved by changing the "MailboxDatabase" configuration directive in
+the main sendmail configuration file, from "pw" (usually the default) to
+"mysql", and then setting the MysqlMailboxTable configuration directive in
+your /etc/mail/sqlmail.conf file.
+
+At present there is no facility in sendmail to allow for lookups in multiple
+different mailbox databases(?).
+
+You can do the same with the UserDatabase, by setting that directive to "mysql"
+too, and of course setting the MysqlUserTable directive in the Sendmail-SQL
+configuration file. This is currently experimental, an may not work yet.
+
+OTHER CLASSES
+
+The new feature that it is 0.2.3 is that now you can have 
+a MySQL class for any kinda marco like the F class.
+
+Ex: Qw -Hlocalhost -Dmail -Tdomain
+
+You can store any kinda macro data in MySQL like in any F class
+for exif you have a table like that, it will assign all those values
+the the w marco so instead of the sendmail.cw file (/etc/mail/local-host-names
+in some versions) you can have the following table:
+
++--------------------+
+| domain             |
++--------------------+
+| altavista.com      |
+| virtualdomain1.com |
+| yahoo.com          |
+| mydomain.net       |
++--------------------+
+
+or like that:
+
++--------------------+
+| SpamList           |
++--------------------+
+| altavista.com      |
+| virtualdomain1.com |
+| yahoo.com          |
+| mydomain.net       |
++--------------------+
+ and the you just use it like F or C classes:
+
+Q{SpamList} -Hlocalhost -Dmail -TSpam
+
+for the Q( MySQL ) class you can only have a simple table
+with 1 column.
+
+The password and username are taken only from /etc/mail/sqlmail.conf (for now)
+
+The options:
+
+-H -> hostname
+-D -> database name
+-T -> table name
+-U -> MySQL username to access the database.
+
+for the rest please read the prvious READMEs
+A full and more comprehencive doc is to come
+
+OTHER MAPS
+
+You can also define maps (which you can use for transforms, whereas you can only
+perform lookups on a class), using Sendmail-SQL.
+
+For example, this section of table will map several subdomains of ore.org to
+the root domain ore.org:
+
++----------------+---------+
+| lhs            | rhs     |
++----------------+---------+
+| a.ore.org      | ore.org |
+| b.ore.org      | ore.org |
+| c.ore.org      | ore.org |
++----------------+---------+
+
+The following options exist in Sendmail-SQL class definitions (note the extras):
+
+-H -> hostname
+-D -> database name
+-T -> table name
+-U -> MySQL username to access the database.
+-L -> LHS column in the table
+-R -> RHS column in the table
+-M -> MySQL map table name.
+
+So, you would use the following configuration line, for example to access the
+above table structure for the "virtuser" class:
+
+Kvirtuser mysql -Mvirtuser -Llhs -Rrhs -Dsendmail -Hlocalhost -U<mysql user>
+
+M4 CONFIGURATION.
+
+At this stage, m4 configuration for Sendmail SQL is in its infancy, even more
+so than the whole project.
+
+There is no support for Sendmail-SQL mysql-alias configuration via m4, since
+there is no support for generating /etc/mail/sqlmail.conf, etc. via m4.
+
+However, if you wish to utilise SQL maps and classes, you can use the following
+m4 lines in your /etc/mail/sendmail.mc file, and use the appropriate m4
+incantation to generate /etc/sendmail.cf from it:
+
+m4 /etc/mail/sendmail.cw > /etc/sendmail.cf
+
+The following can be adapted to your particular needs, but should generate
+mysql maps in your sendmail.cf:
+
+FEATURE(`genericstable',`mysql -Mgenericstable')dnl
+FEATURE(`virtusertable',`mysql -Mvirtuser -Llhs -Rrhs -Dsendmail')dnl
+FEATURE(`mailertable',`mysql -Mmailertable -Ldomain -Rmapping -Dsendmail')dnl
+
+Or if you're feeling particularly brave, you may try the following, which are
+entirely untested, but included in the patch at this time.
+
+FEATURE(`sql-genericstable');
+FEATURE(`sql-virtusertable');
+FEATURE(`sql-mailertable');
+FEATURE(use_cw_sql);
+
+Sendmail SQL classes are currently not supported at all via m4 configuration.
+
+TESTING/DEBUGGING.
+
+To ensure that you have PostgreSQL and/or MySQL support compiled into Sendmail,
+you can do the following:
+
+[root@myhost sendmail-8.12.9-10]# sendmail -d0.1 -bv root
+Version 8.12.9/SQL-8.12.9-10
+ Compiled with: DNSMAP MYSQLMAP LDAPMAP PGSQLMAP LOG MAP_REGEX
+                MATCHGECOS MIME7TO8 MIME8TO7 NAMED_BIND NETINET NETUNIX NEWDB
+                NIS PIPELINING SASL SCANF USERDB USE_LDAP_INIT
+
+If you run the above command and see the keyword MYSQLMAP in the "Compiled with"
+section, you should have MYSQL support compiled in, and if you see PGSQLMAP in
+there, you should have PostgreSQL support compiled in.
+
+Once you have built your Sendmail SQL binaries, confirmed that they have built
+with the appropriate database support, and created your test configuration file (you didn't overwrite your main sendmail.cf with this yet, right??), you can
+test them using "sendmail -bt <test configuration filename>".
+
+To test a map, use "/map <map name> <address>" in sendmail's test mode:
+
+[root@akasha SOURCES]# sendmail -bt
+ADDRESS TEST MODE (ruleset 3 NOT automatically invoked)
+Enter <ruleset> <address>
+> /map virtuser webmaster@ore.org
+map_lookup: virtuser (nospam@ore.org) no match (68)
+> [CONTROL+D TO EXIT]
+
+To test the entire routing of a mail, use "3,0 <address>" while in test mode,
+or "sendmail -bv <address>" from the command line.
+
+In order to obtain extra debugging information about how the MySQL additions
+are working, use the following standard sendmail debugging switches:
+
+-d27.4  - Debug alias lookups.
+-d28.4  - Debug user database lookups.
+-d37.4	- Debug configuration reading.
+-d38.20 - Debug map configuration.
+-d39.20 - Debug map lookups.
+
+-dsm_trace_mysql.9 - Debug the user libsm user database lookups.
+
+(This method superceedes the MYSQL_VERBOSE flag at compile time, as it's more
+in-line with the Sendmail standard)
+
+ADVICE.
+
+You can configure your primary MX server to run Sendmail-SQL, and your backup
+to run the same, using MySQL replication between the two.
+
+However, for various reasons, if your connectivity isn't very, very good indeed,
+and your servers absolutely rock solid, replication can freeze and die, and
+leave your servers out of sync horribly.
+
+Also, if MySQL dies on either server, you are in the same situation, so it is
+probably worth considering taking a dump of your MySQL databases into flat
+files on a regular basis, and also keeping the original definitions of your
+file classes in your sendmail.cf.
+
+Bear in mind that for any one class/map, you can have multiple different 
+definitions, which can both be used. Although the one you define first is
+(probably) the one which will take precedence.
+
+It is theoretically possible to run the virtusertable map, and the generics
+map from the same table, with the LHS and RHS column names reversed in the
+sendmail configuration, thereby removing the need for separate tables.
+This could be useful.
+
+If you get "undefined reference to `compress'", when compiling the patched
+version of sendmail, you need to include the "zip" libraries with "-lz" in the
+sendmail Makefile. Look for the line mentioning "-lmysqlclient", and append it
+to that line. This should make the patch compile.
+
+PROCMAIL / LOCAL MAILER
+
+Several users have been experiencing problems using procmail. I believe the root
+of these problems is something like the following.
+
+If you have your user database in MySQL, and require procmail to be able to
+perform user lookups from that database, you will need to either patch
+procmail to perform direct MySQL lookups, or use pam-mysql/nss-mysql, to
+allow procmail to do so.
+
+If you do not do one of the above, you will almost certainly encounter problems
+with procmail, or "local mailer", since procmail defaults to being the local
+mailer (see the "Mlocal" line in your sendmail.cf file) on many distributions,
+for example:
+
+Mlocal,         P=/usr/bin/procmail, F=lsDFMAw5:/|@qSPfhn9, S=EnvFromL/HdrFromL, 
+		R=EnvToL/HdrToL,
+                T=DNS/RFC822/X-Unix,
+                A=procmail -t -Y -a $h -d $u
+
+Typical problem symptoms:
+
+[root@localhost mrtg]# mailq
+/var/spool/mqueue (1 request)
+-----Q-ID----- --Size-- -----Q-Time----- ------------Sender/Recipient-----------
+h6MKUsun018988 4 Tue Jul 22 17:30 <root@localhost.localdomain>
+                                  (mailer local died with signal 11)
+                                  <testuser@localhost.localdomain>
+Total requests: 1
+[root@localhost mrtg]#
+
+Various versions of the procmail patch(es) may be found at the following
+locations:
+
+Procmail V3.22, thanks to Tyler Bannister <tbannist(at)users.sourceforge.net>
+
+http://sourceforge.net/tracker/download.php?group_id=13988&atid=313988&file_id=23287&aid=557387
+
+Older versions, thanks to Paul Khavine <pkhavine(at)users.sourceforge.net>
+
+http://www.posixnet.org/index1.html
+
+MAINTAINERS
+
+Kev Green <kyrian(at)users.sourceforge.net>
+Paul Khavine <pkhavine(at)users.sourceforge.net>
+Jonathan Yarden
+
+Please be aware that we are all busy people, and while we will try to help out
+where we can, we all have jobs, and they must take priority over something we
+do in our spare time and for free, so if you're going to ask us for help,
+please make sure that you've read all of the available documentation, and
+checked that the problem you're experiencing is related to the patches
+provided, and not to standard sendmail, postgres, or mysql problems.
+
+Remember, Google (http://www.google.co.uk/), and the Sourceforge project
+forums are your friends, and they may yield an answer much quicker than a
+personal email to any of us.
+
+SPONSORS
+
+The following organisations have helped by donating time, resources, etc. to
+this project.
+
+Sourceforge - http://www.sourceforge.net/
+oRe Net - http://www.orenet.co.uk/
+
+CHANGES
+8.12.11-7 Kev Green 28/05/2004
+   - Realised there was a minor problem with the previous release (before
+     doing the release notification), and modified it to fit the "principle of
+     least astonishment".
+
+8.12.11-6 Kev Green 28/05/2004
+   - Added MysqlNetworkPort option, at users request.
+   - Minor documentation updates. This file needs a full rewrite! :(
+   - Sponsors section. Need paul/tyler/jonathan's sponsors too?
+
+8.12.11-5 Kev Green 26/02/2004
+   - Added query escaping to pgsql maps.
+
+8.12.11-4 Kev Green 08/02/2004
+   - Documentation update to include stuff about the dreaded Procmail problems.
+   - Resurrected mysql_local.[ch] files.
+   - Related updates and compile fixes.
+
+8.12.11-3 Kev Green 07/02/2004
+   - Rebuild against Sendmail 8.12.11.
+   - Fix the config checking for Mbdb and Udb.
+   - Add in mysql_real_escape_string for all non-config-file input, SECURITY!
+
+8.12.10-1 Kev Green 18/09/2003
+   - Rebuild against Sendmail 8.12.10, after CAN-2003-0694 & RHSA-2003:283-01
+
+8.12.9-19 Kev Green 13/08/2003.
+   - Documentation update, -lz compile issues.
+
+8.12.9-18 Kev Green, 14/06/2003.
+   - Rebuilt everything with MILTER support enabled.
+
+8.12.9-17 Kev Green, 15/05/2003.
+   - Added & released mysql user database support in sendmail/udb.c
+   - Corrected bugs in the above.
+   - Documentation updates.
+
+8.12.9-10 Kev Green, 31/03/2003.
+   - Added exception handling into various functions for bug tracking.
+   - Removed obsolete/incorrect/duplicate changes in sendmail-sql-Makefile
+     patch.
+   - get_mysql_conf bugfix.
+   - Big documentation updates.
+   - Changes from MYSQL_VERBOSE to -dX.Y switches within the mysql patch.
+   - Added CompileOptions definitions for PGSQL and MYSQL
+   - The 'Q' option for the MySQL patch no longer works, due to the letter 'Q'
+     being used to denote QueueDirectory in Sendmail 8.12.x, so we need to work
+     out a new method of configuring it for the next release.
+
+8.12.9 Kev Green, 30/03/2003.
+   - In response to CERT CA-2003-12 sendmail security advisory, created a patch
+     release for 8.12.9
+   - Started using a better versioning scheme.
+   - More debug information.
+   - More documentation.
+   - Cosmetic fixes
+
+8.12.8 Kev Green, 27/03/2003.
+   - Trying to track down bugs in the untested 8.12.8 release.
+   - Adding in bug trapping on both execution of queries, and the retrieval
+     of their respective results, for sanity.
+   - Documentation update, and correction.
+   - Added MysqlSocket configuration directive. (EXPERIMENTAL)
+
+8.12.8 Kev Green, 04/03/2003.
+   - In response to CERT CA-2003-07 sendmail security advisory, checked the
+     patch against sendmail 8.12.8, which worked okay. 
+   - Added some elementary m4 FEATURE() files to the sendmail-cf package.
+   - Made sure that the /etc/mail/sqlmail.conf file was actually included
+     in the RPM.
+   - Applied pgsql maps patch from Jonathan Yarden <jyarden@bluegrass.net>.
+   - Various documentation updates.
+   - Rebuilt RPM's with the new patch version(s)
+   - Added missing BuildPrereq, and Prereq directives.
+   - Started trying to get rid of those sys_nerr, etc. warnings.
+
+8.12.5 Kev Green, 22/10/2002.
+   - Doc file updates.
+   - Added information on m4 configuration, building the patch, debugging,
+     maps, and general advice section.
+
+UNKNOWN Jonathan Yarden, 07/09/2000
+   - Fix for "Broken pipe" error in the Postgres Patch. Thanks to "various
+     people" for spotting this bug.
+
+0.2.3b Paul Khavine, 24/07/1999.
+   - Doc file submitted to Sourceforge by 
+
